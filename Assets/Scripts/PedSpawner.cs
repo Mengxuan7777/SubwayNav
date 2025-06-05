@@ -1,13 +1,15 @@
 using UnityEngine;
 
-public class PedestrianSpawner : MonoBehaviour
+public class PedSpawner : MonoBehaviour
 {
     public GameObject pedestrianPrefab;
     public Transform[] spawnPoints;
     public Transform[] pathParents;
     public int numberOfPedestrians = 10;
 
-    void Start()
+    // REMOVE Start()
+
+    public void SpawnNPCsFromTrain()
     {
         for (int i = 0; i < numberOfPedestrians; i++)
         {
