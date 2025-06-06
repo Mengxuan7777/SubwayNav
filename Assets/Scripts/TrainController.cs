@@ -14,21 +14,24 @@ public class TrainController : MonoBehaviour {
     public PedSpawner npcSpawner;
 
     private void Start() {
-        Debug.Log("🔵 Start() called");
         StartCoroutine(TrainScheduleRoutine());
     }
 
     IEnumerator TrainScheduleRoutine() {
         Debug.Log("🟢 TrainScheduleRoutine STARTED");
-        
+
+        // Spawn immediately
+        yield return StartCoroutine(RunSingleTrain());
+
         while (true) {
             yield return new WaitForSeconds(intervalBetweenTrains);
+            Debug.Log("🟠 Spawning train...");
             yield return StartCoroutine(RunSingleTrain());
         }
     }
 
+
     IEnumerator RunSingleTrain() {
-        Debug.Log("🟡 RunSingleTrain coroutine STARTED");
         GameObject train = Instantiate(trainPrefab);
         BezierWalkerWithSpeed walker = train.GetComponent<BezierWalkerWithSpeed>();
         
