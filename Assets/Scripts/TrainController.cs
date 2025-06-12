@@ -1,68 +1,95 @@
-using System.Collections;
 using UnityEngine;
 using BezierSolution;
+using System.Collections;
 
-public class TrainController : MonoBehaviour {
-    public GameObject trainPrefab;
-    public BezierSpline spline;
+[RequireComponent(typeof(BezierWalkerWithSpeed))]
+public class TrainController : MonoBehaviour
+{
+    [Header("Train Settings")]
+    public float stopNormalizedT = 0.25f;   // Normalized point to stop
+    public float stopDuration = 30f;
+    public float maxSpeed = 50f;
+    public float accelerationTime = 3f;     // Time to speed up/down
 
-    public float intervalBetweenTrains = 30f;
-    public float dwellTimeAtPlatform = 100f;
-    public float platformStopT = 0.5f;  // Adjust this based on your spline
-    public float stopThreshold = 0.01f;
+    [Header("NPC Spawner")]
+    public PedSpawner pedSpawner;
 
-    public PedSpawner npcSpawner;
+    private BezierWalkerWithSpeed walker;
+    private float lastT = 0f;
+    private bool isStopping = false;
+    private bool hasStoppedThisLoop = false;
 
-    private void Start() {
-        StartCoroutine(TrainScheduleRoutine());
+    void Start()
+    {
+        walker = GetComponent<BezierWalkerWithSpeed>();
+
+        if (walker.spline == null)
+        {
+            Debug.LogError("TrainController: Spline not assigned!");
+            enabled = false;
+            return;
+        }
+
+        walker.speed = maxSpeed;
     }
 
-    IEnumerator TrainScheduleRoutine() {
-        Debug.Log("🟢 TrainScheduleRoutine STARTED");
+    void Update()
+    {
+        float currentT = walker.NormalizedT;
 
-        // Spawn immediately
-        yield return StartCoroutine(RunSingleTrain());
+        if (currentT < lastT)
+        {
+            hasStoppedThisLoop = false;
+        }
+        lastT = currentT;
 
-        while (true) {
-            yield return new WaitForSeconds(intervalBetweenTrains);
-            Debug.Log("🟠 Spawning train...");
-            yield return StartCoroutine(RunSingleTrain());
+        if (isStopping || hasStoppedThisLoop)
+            return;
+
+        if (currentT >= stopNormalizedT)
+        {
+            isStopping = true;
+
+            StartCoroutine(SlowDownAndStop());
         }
     }
 
+    IEnumerator SlowDownAndStop()
+    {
+        // Smoothly reduce speed to 0
+        float startSpeed = walker.speed;
+        float elapsed = 0f;
 
-    IEnumerator RunSingleTrain() {
-        GameObject train = Instantiate(trainPrefab);
-        BezierWalkerWithSpeed walker = train.GetComponent<BezierWalkerWithSpeed>();
-        
-        walker.spline = spline;
-        walker.speed = 5f;
-
-        bool hasStoppedAtPlatform = false;
-
-        while (walker.NormalizedT < 1f) {
-            Debug.Log("Train T: " + walker.NormalizedT.ToString("F3"));
-            // Stop when close to platform T
-            if (!hasStoppedAtPlatform && Mathf.Abs(walker.NormalizedT - platformStopT) < stopThreshold) {
-                hasStoppedAtPlatform = true;
-                float originalSpeed = walker.speed;
-                walker.speed = 0f;
-
-                // Spawn NPCs
-                npcSpawner?.SpawnNPCsFromTrain();
-
-                Debug.Log("Train is stopping at platform for " + dwellTimeAtPlatform + " seconds.");
-
-
-                // Wait at platform
-                yield return new WaitForSeconds(dwellTimeAtPlatform);
-
-                walker.speed = originalSpeed; // resume movement
-            }
-
+        while (elapsed < accelerationTime)
+        {
+            walker.speed = Mathf.Lerp(startSpeed, 0f, elapsed / accelerationTime);
+            elapsed += Time.deltaTime;
             yield return null;
         }
 
-        Destroy(train);
+        walker.speed = 0f;
+
+        if (pedSpawner != null)
+            pedSpawner.SpawnNPCsFromTrain();
+
+        yield return new WaitForSeconds(stopDuration);
+
+        StartCoroutine(SpeedUp());
+    }
+
+    IEnumerator SpeedUp()
+    {
+        float elapsed = 0f;
+
+        while (elapsed < accelerationTime)
+        {
+            walker.speed = Mathf.Lerp(0f, maxSpeed, elapsed / accelerationTime);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        walker.speed = maxSpeed;
+        isStopping = false;
+        hasStoppedThisLoop = true;
     }
 }

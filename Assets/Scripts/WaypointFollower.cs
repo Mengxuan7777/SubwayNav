@@ -7,6 +7,8 @@ public class WaypointFollower : MonoBehaviour
     private int currentWaypointIndex = 0;
     private NavMeshAgent agent;
 
+    public bool loop = false; // Enable looping if desired
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -15,16 +17,39 @@ public class WaypointFollower : MonoBehaviour
         {
             agent.SetDestination(waypoints[currentWaypointIndex].position);
         }
+        else
+        {
+            Debug.LogWarning("WaypointFollower: No waypoints assigned.");
+        }
     }
 
     void Update()
     {
-        if (waypoints == null || waypoints.Length == 0) return;
+        if (waypoints == null || waypoints.Length == 0 || agent.pathPending)
+            return;
 
-        if (!agent.pathPending && agent.remainingDistance < 0.2f)
+        if (agent.remainingDistance <= agent.stoppingDistance)
         {
-            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
-            agent.SetDestination(waypoints[currentWaypointIndex].position);
+            if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+            {
+                currentWaypointIndex++;
+
+                if (currentWaypointIndex < waypoints.Length)
+                {
+                    agent.SetDestination(waypoints[currentWaypointIndex].position);
+                }
+                else if (loop)
+                {
+                    currentWaypointIndex = 0;
+                    agent.SetDestination(waypoints[currentWaypointIndex].position);
+                }
+                else
+                {
+                    // Stop movement
+                    agent.isStopped = true;
+                    enabled = false;
+                }
+            }
         }
     }
 }
