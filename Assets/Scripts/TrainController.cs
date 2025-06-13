@@ -6,10 +6,11 @@ using System.Collections;
 public class TrainController : MonoBehaviour
 {
     [Header("Train Settings")]
-    public float stopNormalizedT = 0.25f;   // Normalized point to stop
-    public float stopDuration = 30f;
-    public float maxSpeed = 50f;
-    public float accelerationTime = 3f;     // Time to speed up/down
+    public float stopNormalizedT = 0.85f;       // Point on spline where train should stop
+    public float brakeOffsetT = 0.06f;          // How early (normalizedT) to start braking
+    public float stopDuration = 30f;            // How long train stays stopped
+    public float maxSpeed = 50f;                // Top speed
+    public float accelerationTime = 3f;         // Time to speed up or slow down
 
     [Header("NPC Spawner")]
     public PedSpawner pedSpawner;
@@ -37,6 +38,7 @@ public class TrainController : MonoBehaviour
     {
         float currentT = walker.NormalizedT;
 
+        // Reset stop flag on loop wraparound
         if (currentT < lastT)
         {
             hasStoppedThisLoop = false;
@@ -46,17 +48,19 @@ public class TrainController : MonoBehaviour
         if (isStopping || hasStoppedThisLoop)
             return;
 
-        if (currentT >= stopNormalizedT)
-        {
-            isStopping = true;
+        float brakeStartT = stopNormalizedT - brakeOffsetT;
 
+        // Only trigger if in forward half of the loop
+        if (currentT >= 0.5f && currentT >= brakeStartT && currentT <= stopNormalizedT)
+        {
+            Debug.Log($"🚉 Start braking at T = {currentT}");
+            isStopping = true;
             StartCoroutine(SlowDownAndStop());
         }
     }
 
     IEnumerator SlowDownAndStop()
     {
-        // Smoothly reduce speed to 0
         float startSpeed = walker.speed;
         float elapsed = 0f;
 
@@ -68,6 +72,7 @@ public class TrainController : MonoBehaviour
         }
 
         walker.speed = 0f;
+        Debug.Log("Train stopped at T = " + walker.NormalizedT);
 
         if (pedSpawner != null)
             pedSpawner.SpawnNPCsFromTrain();

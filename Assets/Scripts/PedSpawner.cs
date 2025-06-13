@@ -1,34 +1,44 @@
 using UnityEngine;
+using System.Collections;
 
 public class PedSpawner : MonoBehaviour
 {
     [Header("Pedestrian Prefabs")]
-    public GameObject[] pedestrianPrefabs; // Array of prefab options
+    public GameObject[] pedestrianPrefabs;
 
     [Header("Spawn Configuration")]
-    public Transform[] spawnPoints;
+    public Transform[] spawnPoints;       // Only 2 spawn points
     public Transform[] pathParents;
-    public int numberOfPedestrians = 10;
+    public int npcsPerSpawnPoint = 5;
+    public float spawnInterval = 2f;      // Delay between spawns per point
 
     public void SpawnNPCsFromTrain()
     {
-        for (int i = 0; i < numberOfPedestrians; i++)
+        // Start coroutine for each spawn point
+        for (int i = 0; i < spawnPoints.Length; i++)
+        {
+            StartCoroutine(SpawnFromPoint(i));
+        }
+    }
+
+    private IEnumerator SpawnFromPoint(int spawnIndex)
+    {
+        Transform spawnPoint = spawnPoints[spawnIndex];
+
+        for (int i = 0; i < npcsPerSpawnPoint; i++)
         {
             // Pick random prefab
             GameObject selectedPrefab = pedestrianPrefabs[Random.Range(0, pedestrianPrefabs.Length)];
-
-            // Pick spawn point in order or randomly
-            Transform spawnPoint = spawnPoints[i % spawnPoints.Length];
             Vector3 spawnPosition = spawnPoint.position;
 
-            // Instantiate selected prefab
+            // Instantiate NPC
             GameObject pedestrian = Instantiate(selectedPrefab, spawnPosition, Quaternion.identity);
 
-            // Assign unique path
+            // Assign random path
             WaypointFollower follower = pedestrian.GetComponent<WaypointFollower>();
-            if (follower != null && i < pathParents.Length)
+            if (follower != null && pathParents.Length > 0)
             {
-                Transform pathParent = pathParents[i];
+                Transform pathParent = pathParents[Random.Range(0, pathParents.Length)];
                 Transform[] waypoints = new Transform[pathParent.childCount];
 
                 for (int j = 0; j < waypoints.Length; j++)
@@ -38,7 +48,8 @@ public class PedSpawner : MonoBehaviour
 
                 follower.waypoints = waypoints;
             }
+
+            yield return new WaitForSeconds(spawnInterval); // Delay before next NPC from this point
         }
     }
 }
-
