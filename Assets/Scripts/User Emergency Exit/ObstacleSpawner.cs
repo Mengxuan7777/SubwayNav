@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -26,11 +25,11 @@ public class ObstacleSpawner : MonoBehaviour {
             obstacle.SetActive(false);
             yield return new WaitForSeconds(3);
 
-            // Unhide the obstacle for 3 seconds
+            // Unhide the obstacle for 15 seconds
             obstacle.SetActive(true);
             yield return new WaitForSeconds(1);
             user.UpdatePath(); // Update path for user
-            yield return new WaitForSeconds(4);
+            yield return new WaitForSeconds(14);
         }
     }
 }
