@@ -12,7 +12,7 @@ public class WaypointFollower : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        Debug.Log($"{gameObject.name} waypoints assigned: {waypoints?.Length}");
+        //Debug.Log($"{gameObject.name} waypoints assigned: {waypoints?.Length}");
 
 
         if (waypoints != null && waypoints.Length > 0)

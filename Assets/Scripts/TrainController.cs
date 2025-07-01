@@ -53,7 +53,7 @@ public class TrainController : MonoBehaviour
         // Only trigger if in forward half of the loop
         if (currentT >= 0.5f && currentT >= brakeStartT && currentT <= stopNormalizedT)
         {
-            Debug.Log($"🚉 Start braking at T = {currentT}");
+            //Debug.Log($"🚉 Start braking at T = {currentT}");
             isStopping = true;
             StartCoroutine(SlowDownAndStop());
         }

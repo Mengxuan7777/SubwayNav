@@ -4,7 +4,7 @@ using UnityEngine;
 public class ObstacleSpawner : MonoBehaviour {
     // Start is called before the first frame update
     public GameObject obstacle;
-    public ShortestPath user;
+    public GeneratePath user;
     
     // Prevent multiple spawns
     private bool isSpawning = false; 
@@ -28,7 +28,7 @@ public class ObstacleSpawner : MonoBehaviour {
             // Unhide the obstacle for 15 seconds
             obstacle.SetActive(true);
             yield return new WaitForSeconds(1);
-            user.UpdatePath(); // Update path for user
+            user.UpdatePath(obstacle.transform); // Update path for user
             yield return new WaitForSeconds(14);
         }
     }
