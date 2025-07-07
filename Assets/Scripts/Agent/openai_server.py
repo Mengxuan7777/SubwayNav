@@ -4,7 +4,10 @@ import os
 import json
 import re
 
-client = OpenAI(api_key="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")
+with open("C:/Users/jessl/Downloads/api_key.txt", "r") as f:
+    api_key = f.read().strip()
+
+client = OpenAI(api_key=api_key)
 app = Flask(__name__)
 
 def build_llm_prompt(start, paths):
@@ -26,9 +29,10 @@ def build_llm_prompt(start, paths):
         "Respond in valid JSON format like this:\n"
         "{\n"
         "  \"reason\": \"[reason for choosing this path]\",\n"
-        "  \"nextNode\": \"[name of next node after agent's position]\"\n"
+        "  \"path\": [\"Node1\", \"Node2\", \"Node3\"]\n"
         "}"
     )
+    
     return prompt
 
 @app.route("/query", methods=["POST"])

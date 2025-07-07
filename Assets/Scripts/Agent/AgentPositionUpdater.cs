@@ -18,7 +18,7 @@ public class AgentPositionUpdater : MonoBehaviour
         while (true)
         {
             decisionManager.UpdateAgentPosition(agentTransform.position);
-            yield return new WaitForSeconds(30f);
+            yield return new WaitForSeconds(60f);
         }
     }
 }

@@ -7,24 +7,29 @@ import uuid
 
 app = Flask(__name__)
 
-# Load JSON node data
+# Load node positions
 with open("station_nodes.json", "r") as f:
     data = json.load(f)
 
-# Build node position lookup
 node_positions = {
     node["name"]: (node["x"], node["y"], node["z"])
     for node in data["nodes"]
 }
 
-# Create directed graph
-G = nx.DiGraph()
+# Load NavMesh distances
+with open("navmesh_distances.json", "r") as f:
+    nav_data = json.load(f)
 
-# Add nodes with positions
+navmesh_distances = {
+    (entry["from"], entry["to"]): entry["distance"]
+    for entry in nav_data["distances"]
+}
+
+# Build graph
+G = nx.DiGraph()
 for name, pos in node_positions.items():
     G.add_node(name, position=pos)
 
-# Define edge list
 original_edges = [
     ("US1", "US2"), ("US1", "US3"), ("US3", "US2"), ("DS1", "DS2"), ("DS1", "DS3"), ("DS3", "DS2"),
     ("US1", "NM"), ("US2", "NM"), ("US3", "SM"),
@@ -32,15 +37,13 @@ original_edges = [
     ("NM", "EX1"), ("NM", "EX2"),
     ("SM", "EX3"), ("SM", "EX4")
 ]
-
-# Make bidirectional edges
 edges = original_edges + [(v, u) for u, v in original_edges]
 
-# Compute and store base distances
+# Compute edge weights using navmesh distances
 raw_distances = []
 for u, v in edges:
     if u in node_positions and v in node_positions:
-        d = dist(node_positions[u], node_positions[v])
+        d = navmesh_distances.get((u, v), dist(node_positions[u], node_positions[v]))
         raw_distances.append((u, v, d))
 
 for u, v, d in raw_distances:
@@ -51,29 +54,25 @@ def get_path():
     try:
         data = request.get_json()
         pos = [data["x"], data["y"], data["z"]]
-        crowd_levels = data.get("crowd", {})  # {"US1": 0.5, "SM": 1.0, ...}
+        crowd_levels = data.get("crowd", {})
         smoke_levels = data.get("smoke", {})
         fire_levels = data.get("fire", {})
 
-        # Update edge weights
-        alpha, beta, gamma = 1.0, 2.0, 3.0  # weight multipliers
-        
-        # Precompute max base distance for normalization
+        alpha, beta, gamma = 1.0, 2.0, 3.0
         max_base_distance = max((G[u][v]["base_distance"] for u, v in G.edges()), default=1.0)
 
-        # Update edge weights
         for u, v in G.edges():
             c = max(crowd_levels.get(u, 0.0), crowd_levels.get(v, 0.0))
             s = max(smoke_levels.get(u, 0.0), smoke_levels.get(v, 0.0))
             f = max(fire_levels.get(u, 0.0), fire_levels.get(v, 0.0))
-            base = G[u][v]["base_distance"] / max_base_distance  # Normalize to [0,1]
+            base = G[u][v]["base_distance"] / max_base_distance
             total = base + alpha * c + beta * s + gamma * f
             G[u][v].update(weight=total, crowd=c, smoke=s, fire=f)
 
-        # Add temporary start node
+        # Add temporary agent node
         start_node = f"agent_{uuid.uuid4()}"
         G.add_node(start_node, position=tuple(pos))
-        connection_radius = 5.0  # how far the agent can link to real nodes
+        connection_radius = 5.0
 
         for node_name, node_pos in node_positions.items():
             d = dist(node_pos, pos)
@@ -105,7 +104,7 @@ def get_path():
             except nx.NetworkXNoPath:
                 continue
 
-        G.remove_node(start_node)  # clean up
+        G.remove_node(start_node)
         return jsonify({"paths": paths})
 
     except Exception as e:

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PathDecisionManager : MonoBehaviour
 {
@@ -38,7 +39,7 @@ public class PathDecisionManager : MonoBehaviour
                 yield break;
             }
 
-            PathOption bestPath = response.paths[0];  // Use first path for now
+            PathOption bestPath = response.paths[0];
             string currentNode = bestPath.nodes[0];
             StartCoroutine(QueryLLM(currentNode, response.paths));
         }
@@ -67,27 +68,48 @@ public class PathDecisionManager : MonoBehaviour
         {
             LLMResponse reply = JsonUtility.FromJson<LLMResponse>(req.downloadHandler.text);
             Debug.Log("💬 LLM Reasoning: " + reply.reason);
-            Debug.Log("📎 Raw nextNode from LLM: '" + reply.nextNode + "'");
-            mover.MoveToNode(reply.nextNode);
-        }
 
+            mover.DrawFullLLMPath(reply.path);
+            StartCoroutine(MoveAlongPath(reply.path));
+        }
         else
         {
             Debug.LogError("⚠️ LLM query error: " + req.error);
         }
     }
 
-    private string ExtractNodeFromReply(string reply)
+    private IEnumerator MoveAlongPath(string[] path)
     {
-        int start = reply.IndexOf("[") + 1;
-        int end = reply.IndexOf("]");
-        if (start >= 0 && end > start)
+        if (path == null || path.Length == 0)
         {
-            string insideBrackets = reply.Substring(start, end - start);
-            string[] nodes = insideBrackets.Replace("'", "").Split(',');
-            return nodes.Length > 1 ? nodes[1].Trim() : nodes[0].Trim(); // return next node
+            Debug.LogError("⚠️ Path is empty or null.");
+            yield break;
         }
-        return "";
+
+        List<string> cleanPath = new List<string>();
+        foreach (string node in path)
+        {
+            if (!node.StartsWith("agent_") && mover.HasNode(node))
+            {
+                cleanPath.Add(node);
+            }
+            else
+            {
+                Debug.LogWarning($"❌ Node not found or skipped: {node}");
+            }
+        }
+
+        Debug.Log("🧭 Cleaned LLM path: " + string.Join(" → ", cleanPath));
+
+        foreach (string nodeName in cleanPath)
+        {
+            Debug.Log("🚶 Moving to: " + nodeName);
+            yield return StartCoroutine(mover.MoveToAndWait(nodeName));
+            yield return new WaitForSeconds(0.25f);  // optional pause
+        }
+
+        Debug.Log("🎯 Reached final destination.");
+        mover.ClearPathLine();
     }
 
     // --- Data Classes ---
@@ -128,7 +150,6 @@ public class PathDecisionManager : MonoBehaviour
     public class LLMResponse
     {
         public string reason;
-        public string nextNode;
+        public string[] path;
     }
-
 }
