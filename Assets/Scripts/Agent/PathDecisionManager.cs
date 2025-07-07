@@ -2,9 +2,12 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro; 
 
 public class PathDecisionManager : MonoBehaviour
 {
+    public TMP_Text promptDisplay;  
+    public TMP_Text decisionDisplay; 
     private AgentMover mover;
 
     private void Awake()
@@ -49,6 +52,7 @@ public class PathDecisionManager : MonoBehaviour
         }
     }
 
+
     private IEnumerator QueryLLM(string currentNode, PathOption[] paths)
     {
         LLMRequest request = new LLMRequest
@@ -56,6 +60,13 @@ public class PathDecisionManager : MonoBehaviour
             start_node = currentNode,
             paths = paths
         };
+
+        string prompt = GenerateLLMPrompt(currentNode, paths);  // 🧠 Construct the prompt string
+
+        if (promptDisplay != null)
+        {
+            promptDisplay.text = prompt;  // 🖼️ Show the path options
+        }
 
         string json = JsonUtility.ToJson(request);
         UnityWebRequest req = UnityWebRequest.Put("http://localhost:5000/query", json);
@@ -69,6 +80,17 @@ public class PathDecisionManager : MonoBehaviour
             LLMResponse reply = JsonUtility.FromJson<LLMResponse>(req.downloadHandler.text);
             Debug.Log("💬 LLM Reasoning: " + reply.reason);
 
+            if (decisionDisplay != null)
+            {
+                decisionDisplay.text = $"💡 LLM Decision:\n{reply.reason}\n➡️ Next Node: {reply.path?[1] ?? "N/A"}";
+            }
+
+            if (reply.path == null || reply.path.Length == 0)
+            {
+                Debug.LogWarning("⚠️ LLM returned an empty or null path.");
+                yield break;
+            }
+
             mover.DrawFullLLMPath(reply.path);
             StartCoroutine(MoveAlongPath(reply.path));
         }
@@ -76,6 +98,7 @@ public class PathDecisionManager : MonoBehaviour
         {
             Debug.LogError("⚠️ LLM query error: " + req.error);
         }
+        
     }
 
     private IEnumerator MoveAlongPath(string[] path)
@@ -110,6 +133,22 @@ public class PathDecisionManager : MonoBehaviour
 
         Debug.Log("🎯 Reached final destination.");
         mover.ClearPathLine();
+    }
+
+    private string GenerateLLMPrompt(string currentNode, PathOption[] paths)
+    {
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        sb.AppendLine($"🤖 Current node: {currentNode}");
+        sb.AppendLine("🔀 Path options:");
+
+        foreach (var path in paths)
+        {
+            string nodeList = string.Join(" → ", path.nodes);
+            sb.AppendLine($"  - Cost: {path.cost:F2}, Crowd: {path.factors.crowd}, Smoke: {path.factors.smoke}");
+            sb.AppendLine($"    Path: {nodeList}");
+        }
+
+        return sb.ToString();
     }
 
     // --- Data Classes ---

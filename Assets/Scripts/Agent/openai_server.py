@@ -15,6 +15,8 @@ def build_llm_prompt(start, paths):
     labels = ['A', 'B', 'C', 'D']
     for i, path in enumerate(paths):
         p = path["nodes"]
+        if p[0].startswith("agent_"):
+            p = p[1:]
         f = path["factors"]
         c = path["cost"]
         prompt += (

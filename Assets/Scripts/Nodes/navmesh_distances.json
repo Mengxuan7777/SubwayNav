@@ -3,152 +3,152 @@
         {
             "from": "US1",
             "to": "US2",
-            "distance": 28.821550369262697
+            "distance": 29.0679931640625
         },
         {
             "from": "US2",
             "to": "US1",
-            "distance": 28.996898651123048
+            "distance": 28.90748405456543
         },
         {
             "from": "US1",
             "to": "US3",
-            "distance": 99.59263610839844
+            "distance": 99.17713165283203
         },
         {
             "from": "US3",
             "to": "US1",
-            "distance": 99.20500183105469
+            "distance": 98.59202575683594
         },
         {
             "from": "US3",
             "to": "US2",
-            "distance": 70.87495422363281
+            "distance": 70.4097900390625
         },
         {
             "from": "US2",
             "to": "US3",
-            "distance": 71.96076965332031
+            "distance": 70.81684112548828
         },
         {
             "from": "DS1",
             "to": "DS2",
-            "distance": 28.388090133666993
+            "distance": 28.489849090576173
         },
         {
             "from": "DS2",
             "to": "DS1",
-            "distance": 28.729583740234376
+            "distance": 28.489849090576173
         },
         {
             "from": "DS1",
             "to": "DS3",
-            "distance": 97.9561538696289
+            "distance": 97.7455062866211
         },
         {
             "from": "DS3",
             "to": "DS1",
-            "distance": 97.63459014892578
+            "distance": 97.4970703125
         },
         {
             "from": "DS3",
             "to": "DS2",
-            "distance": 69.74443054199219
+            "distance": 69.74476623535156
         },
         {
             "from": "DS2",
             "to": "DS3",
-            "distance": 70.15406799316406
+            "distance": 69.91345977783203
         },
         {
             "from": "US1",
             "to": "NM",
-            "distance": 20.633487701416017
+            "distance": 21.937345504760743
         },
         {
             "from": "NM",
             "to": "US1",
-            "distance": 20.63348960876465
+            "distance": 20.66876792907715
         },
         {
             "from": "US2",
             "to": "NM",
-            "distance": 47.89037322998047
+            "distance": 47.860591888427737
         },
         {
             "from": "NM",
             "to": "US2",
-            "distance": 47.890377044677737
+            "distance": 48.411537170410159
         },
         {
             "from": "US3",
             "to": "SM",
-            "distance": 26.46335792541504
+            "distance": 26.850982666015626
         },
         {
             "from": "SM",
             "to": "US3",
-            "distance": 26.970571517944337
+            "distance": 26.486961364746095
         },
         {
             "from": "DS1",
             "to": "NM",
-            "distance": 20.172687530517579
+            "distance": 20.22564697265625
         },
         {
             "from": "NM",
             "to": "DS1",
-            "distance": 20.172687530517579
+            "distance": 20.279136657714845
         },
         {
             "from": "DS2",
             "to": "NM",
-            "distance": 47.29263687133789
+            "distance": 47.31937026977539
         },
         {
             "from": "NM",
             "to": "DS2",
-            "distance": 47.285133361816409
+            "distance": 48.505462646484378
         },
         {
             "from": "DS3",
             "to": "SM",
-            "distance": 26.419103622436525
+            "distance": 26.256868362426759
         },
         {
             "from": "SM",
             "to": "DS3",
-            "distance": 26.391681671142579
+            "distance": 26.368757247924806
         },
         {
             "from": "NM",
             "to": "EX1",
-            "distance": 33.971073150634769
+            "distance": 33.95087814331055
         },
         {
             "from": "EX1",
             "to": "NM",
-            "distance": 34.11389923095703
+            "distance": 34.120208740234378
         },
         {
             "from": "SM",
             "to": "EX3",
-            "distance": 31.02836036682129
+            "distance": 29.739734649658204
         },
         {
             "from": "EX3",
             "to": "SM",
-            "distance": 29.76633644104004
+            "distance": 29.73973274230957
         },
         {
             "from": "SM",
             "to": "EX4",
-            "distance": 15.675678253173829
+            "distance": 15.463357925415039
         },
         {
             "from": "EX4",
             "to": "SM",
-            "distance": 15.65317153930664
+            "distance": 15.406730651855469
         }
     ]
 }
