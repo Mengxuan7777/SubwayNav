@@ -4,7 +4,7 @@ using Random = System.Random;
 
 public class ObstacleSpawner : MonoBehaviour {
     // Start is called before the first frame update
-    public GameObject[] obstacle;
+    public GameObject[] obstacles;
     public GeneratePath user;
     
     // Prevent multiple spawns
@@ -12,15 +12,15 @@ public class ObstacleSpawner : MonoBehaviour {
     
     // Random Generator
     private readonly Random rnd = new Random();
-
-    private void Update() {
+    
+    private void Start() {
         // Deactivate all obstacles
-        foreach (var obj in obstacle) {
+        foreach (var obj in obstacles) {
             obj.SetActive(false);
         }
         
         // Randomly select a obstacle to set 
-        if (!isSpawning && obstacle is not null  && user) {
+        if (!isSpawning && obstacles is not null  && user) {
             StartCoroutine(PeriodicSpawn());
             isSpawning = true;
         }
@@ -33,9 +33,8 @@ public class ObstacleSpawner : MonoBehaviour {
         yield return new WaitForSeconds(wait);
         
         // pick a random obstacle
-        //var randomObstacle = rnd.Next(0, obstacle.Length);
-        var randomObstacle = 0;
-        GameObject selectedObstacle = obstacle[randomObstacle];
+        var randomObstacle = rnd.Next(0, obstacles.Length);
+        GameObject selectedObstacle = obstacles[randomObstacle];
         selectedObstacle.SetActive(true);
         user.UpdatePath(selectedObstacle.transform);
     }
