@@ -11,7 +11,31 @@ NavMeshProjectSettings:
     cost: 1
   - name: Jump
     cost: 2
-  - name: 
+  - name: Stairs_L1_NB_1
+    cost: 1
+  - name: Stairs_L1_NB_2
+    cost: 1
+  - name: Stairs_L1_SB_1
+    cost: 1
+  - name: Stairs_L1_SB_2
+    cost: 1
+  - name: Stairs_L2_NB_1
+    cost: 1
+  - name: Stairs_L2_NB_2
+    cost: 1
+  - name: Stairs_L2_SB_1
+    cost: 1
+  - name: Stairs_L2_SB_2
+    cost: 1
+  - name: Platform_SB_1
+    cost: 1
+  - name: Platform_SB_2
+    cost: 1
+  - name: Platform_NB_1
+    cost: 1
+  - name: Platform_NB_2
+    cost: 1
+  - name: Turnstiles
     cost: 1
   - name: 
     cost: 1
@@ -33,32 +57,8 @@ NavMeshProjectSettings:
     cost: 1
   - name: 
     cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
-  - name: 
-    cost: 1
+  - name: Street
+    cost: 0.1
   - name: 
     cost: 1
   - name: 

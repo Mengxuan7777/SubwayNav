@@ -55,7 +55,7 @@ public class GeneratePath : MonoBehaviour {
         string jsonPaths = JsonConvert.SerializeObject(pathInfo);
 
         // Feed Data to ChatGPT
-        GetBestPath(paths, jsonPaths);
+        // GetBestPath(paths, jsonPaths);
     }
 
     /// <summary>
@@ -81,23 +81,7 @@ public class GeneratePath : MonoBehaviour {
     }
     
 
-    // ReSharper disable Unity.PerformanceAnalysis
-    private async void GetBestPath(List<NavMeshPath> paths, string jsonPaths) {
-        try {
-            // Get Response from GPT
-            ChatCompletion completion = await client.CompleteChatAsync(
-                "Below is information regarding paths between a user multiple subway exits" + 
-                "Give the distances of each of the paths and the distance of each waypoint of a path to the fire, provide the" +
-                "index of the best exit path. Prioritize avoiding the fire. Only provide a single number" +
-                $"{jsonPaths}");
-            string index = completion.Content[0].Text;
-            Debug.Log($"[GPT]: {index}");
-        
-            VisualizePath(paths[int.Parse(index)]);
-        } catch (Exception e) {
-            Debug.Log(e.Message);
-        }
-    }
+    
     
     /// <summary>
     /// Create and Updates the position of the emergency exit path
