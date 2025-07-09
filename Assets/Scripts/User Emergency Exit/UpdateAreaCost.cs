@@ -16,10 +16,12 @@ public class UpdateAreaCost : MonoBehaviour {
     
     private void OnTriggerEnter(Collider other) {
         // Increase the area cost when pedestrians trigger it.  
+        
         if (EnableOnEntry) {
             var layer = other.gameObject.layer;
             if (layer == 8) {
                 // Increase cost if there is a fire
+                // NavMesh.GetAreaCost(NavMesh.GetAreaFromName(areaName));
                 float cost = NavMesh.GetAreaCost(AreaIndex);
                 NavMesh.SetAreaCost(AreaIndex, cost + 5f);
             } else if (layer == 9) {

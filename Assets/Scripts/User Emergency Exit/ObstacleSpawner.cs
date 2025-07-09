@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = System.Random;
 
 public class ObstacleSpawner : MonoBehaviour {
@@ -25,6 +26,10 @@ public class ObstacleSpawner : MonoBehaviour {
             isSpawning = true;
         }
     }
+    
+    private void Update() {
+        Debug.Log(NavMesh.GetAreaCost(NavMesh.GetAreaFromName("Platform_NB_1")));
+    }
 
     private IEnumerator PeriodicSpawn() {
         // Wait for at least a 1 second
@@ -33,7 +38,8 @@ public class ObstacleSpawner : MonoBehaviour {
         yield return new WaitForSeconds(wait);
         
         // pick a random obstacle
-        var randomObstacle = rnd.Next(0, obstacles.Length);
+        // rnd.Next(0, obstacles.Length);
+        var randomObstacle = 0;
         GameObject selectedObstacle = obstacles[randomObstacle];
         selectedObstacle.SetActive(true);
         user.UpdatePath(selectedObstacle.transform);

@@ -47,7 +47,6 @@ public class GeneratePath : MonoBehaviour {
         
         // Get the total distance of each path and the distance of each
         // waypoint in that path to the fire.
-        Debug.Log("Working");
         PathInformation[] pathInfo = new PathInformation[paths.Count];
         GetPathDistances(paths, pathInfo, fire); 
         
