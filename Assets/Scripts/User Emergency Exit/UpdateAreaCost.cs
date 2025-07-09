@@ -1,36 +1,36 @@
-using System;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class UpdateAreaCost : MonoBehaviour {
     // Settings
     public string areaName;
-    private static int AreaIndex;
     public bool EnableOnEntry = true, EnableOnExit = true;
+    
+    // Data storage
+    private const int crowd = 0,  fire = 0, fireCost = 25;
+    private readonly float[] AreaCost = new float[2];
     
     // Start is called before the first frame update
     void Start() {
-        //Get index of area
-        AreaIndex = NavMesh.GetAreaFromName(areaName);
+        // Set area costs to 1
+        AreaCost[crowd] = 1f;
+        AreaCost[fire] = 1f;
     }
     
     private void OnTriggerEnter(Collider other) {
         // Increase the area cost when pedestrians trigger it.  
-        
         if (EnableOnEntry) {
             var layer = other.gameObject.layer;
             if (layer == 8) {
                 // Increase cost if there is a fire
-                // NavMesh.GetAreaCost(NavMesh.GetAreaFromName(areaName));
-                float cost = NavMesh.GetAreaCost(AreaIndex);
-                NavMesh.SetAreaCost(AreaIndex, cost + 5f);
+                var fireInfo = other.gameObject.GetComponent<FireInformation>();
+                float cost = AreaCost[crowd];
+                AreaCost[crowd] = cost + fireInfo.FireSize * fireCost;
             } else if (layer == 9) {
                 // Increase cost if there is a pedestrian
-                float cost = NavMesh.GetAreaCost(AreaIndex);
-                NavMesh.SetAreaCost(AreaIndex, cost + 0.1f);
+                float cost = AreaCost[crowd];
+                AreaCost[crowd] = cost + 0.1f;
             }
         }
-        
     }
 
     private void OnTriggerExit(Collider other) {
@@ -38,15 +38,20 @@ public class UpdateAreaCost : MonoBehaviour {
         if (EnableOnExit) {
             var layer = other.gameObject.layer;
             if (layer == 8) {
-                // Increase cost if there is a fire
-                float cost = NavMesh.GetAreaCost(AreaIndex);
-                NavMesh.SetAreaCost(AreaIndex, cost - 5f);
+                // Decrease cost if there is a fire
+                var fireInfo = other.gameObject.GetComponent<FireInformation>();
+                float cost = AreaCost[crowd];
+                AreaCost[crowd] = cost - fireInfo.FireSize * fireCost;
             } else if (layer == 9) {
-                // Increase cost if there is a pedestrian
-                float cost = NavMesh.GetAreaCost(AreaIndex);
-                NavMesh.SetAreaCost(AreaIndex, cost - 0.1f);
+                // Decrease cost if there is a pedestrian
+                float cost = AreaCost[crowd];
+                AreaCost[crowd] = cost - 0.1f;
             }
         }
-        
     }
+    
+    public float[] GetAreaCost() {
+        return AreaCost;
+    }
+    
 }
