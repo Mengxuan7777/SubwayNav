@@ -31,7 +31,9 @@ public class ObstacleSpawner : MonoBehaviour {
         yield return new WaitForSeconds(wait);
         
         // pick a random obstacle
-        GameObject selectedObstacle = obstacles[rnd.Next(0, obstacles.Length)];
+        var rndObstacle = rnd.Next(0, obstacles.Length);
+        //var rndObstacle = 5;
+        GameObject selectedObstacle = obstacles[rndObstacle];
         selectedObstacle.SetActive(true);
     }
 }

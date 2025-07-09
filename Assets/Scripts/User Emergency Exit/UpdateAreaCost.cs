@@ -1,7 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class UpdateAreaCost : MonoBehaviour {
     // Settings
@@ -9,7 +7,7 @@ public class UpdateAreaCost : MonoBehaviour {
     public bool EnableOnEntry = true, EnableOnExit = true;
     
     // Data storage
-    private const int crowd = 0,  fire = 0, fireCost = 25;
+    private const int crowd = 0,  fire = 1, fireCost = 25;
     private readonly float[] AreaCost = new float[2];
     
     // Start is called before the first frame update
@@ -19,13 +17,14 @@ public class UpdateAreaCost : MonoBehaviour {
         AreaCost[fire] = 1f;
         
         // Testing
-        StartCoroutine(UpdateAreaCostRoutine());
+        //StartCoroutine(UpdateAreaCostRoutine());
     }
     
     private void OnTriggerEnter(Collider other) {
         // Increase the area cost when pedestrians trigger it.  
         if (EnableOnEntry) {
             var layer = other.gameObject.layer;
+            Debug.Log($"{name}: In contact with later {layer}");
             if (layer == 8) {
                 // Increase cost if there is a fire
                 var fireInfo = other.gameObject.GetComponent<FireInformation>();
@@ -68,7 +67,7 @@ public class UpdateAreaCost : MonoBehaviour {
     private IEnumerator UpdateAreaCostRoutine() {
 
         while (true) {
-            yield return new WaitForSeconds(10f);
+            yield return new WaitForSeconds(0.5f);
             Debug.Log($"{name}: {AreaCost[crowd]}, {AreaCost[fire]}");
         }
     }

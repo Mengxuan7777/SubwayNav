@@ -2,53 +2,33 @@
     "distances": [
         {
             "from": "US1",
-            "to": "US2",
-            "distance": 29.72743797302246
-        },
-        {
-            "from": "US2",
-            "to": "US1",
-            "distance": 29.727436065673829
-        },
-        {
-            "from": "US1",
             "to": "US3",
-            "distance": 99.53939819335938
+            "distance": 128.0522003173828
         },
         {
             "from": "US3",
             "to": "US1",
-            "distance": 99.57763671875
-        },
-        {
-            "from": "US3",
-            "to": "US2",
-            "distance": 70.74067687988281
-        },
-        {
-            "from": "US2",
-            "to": "US3",
-            "distance": 70.60467529296875
+            "distance": 132.89971923828126
         },
         {
             "from": "DS1",
             "to": "DS2",
-            "distance": 28.40268325805664
+            "distance": 28.611122131347658
         },
         {
             "from": "DS2",
             "to": "DS1",
-            "distance": 28.40268325805664
+            "distance": 28.611122131347658
         },
         {
             "from": "DS1",
             "to": "DS3",
-            "distance": 97.78905487060547
+            "distance": 97.85645294189453
         },
         {
             "from": "DS3",
             "to": "DS1",
-            "distance": 97.59748077392578
+            "distance": 97.87479400634766
         },
         {
             "from": "DS3",
@@ -59,6 +39,16 @@
             "from": "DS2",
             "to": "DS3",
             "distance": 69.8227767944336
+        },
+        {
+            "from": "US1",
+            "to": "NM",
+            "distance": 45.329345703125
+        },
+        {
+            "from": "NM",
+            "to": "US1",
+            "distance": 44.795318603515628
         }
     ]
 }
