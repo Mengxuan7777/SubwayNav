@@ -11,31 +11,25 @@ NavMeshProjectSettings:
     cost: 1
   - name: Jump
     cost: 2
-  - name: Stairs_L1_NB_1
+  - name: 
     cost: 1
-  - name: Stairs_L1_NB_2
+  - name: 
     cost: 1
-  - name: Stairs_L1_SB_1
+  - name: 
     cost: 1
-  - name: Stairs_L1_SB_2
+  - name: 
     cost: 1
-  - name: Stairs_L2_NB_1
+  - name: 
     cost: 1
-  - name: Stairs_L2_NB_2
+  - name: 
     cost: 1
-  - name: Stairs_L2_SB_1
+  - name: 
     cost: 1
-  - name: Stairs_L2_SB_2
+  - name: 
     cost: 1
-  - name: Platform_SB_1
+  - name: 
     cost: 1
-  - name: Platform_SB_2
-    cost: 1
-  - name: Platform_NB_1
-    cost: 1
-  - name: Platform_NB_2
-    cost: 1
-  - name: Turnstiles
+  - name: 
     cost: 1
   - name: 
     cost: 1
@@ -57,8 +51,14 @@ NavMeshProjectSettings:
     cost: 1
   - name: 
     cost: 1
-  - name: Street
-    cost: 0.1
+  - name: 
+    cost: 1
+  - name: 
+    cost: 1
+  - name: 
+    cost: 1
+  - name: 
+    cost: 1
   - name: 
     cost: 1
   - name: 
@@ -75,10 +75,10 @@ NavMeshProjectSettings:
     agentTypeID: 0
     agentRadius: 0.1
     agentHeight: 1
-    agentSlope: 60
-    agentClimb: 0.75
-    ledgeDropHeight: 0.5
-    maxJumpAcrossDistance: 0.5
+    agentSlope: 35.9
+    agentClimb: 0.1
+    ledgeDropHeight: 0
+    maxJumpAcrossDistance: 0
     minRegionArea: 2
     manualCellSize: 0
     cellSize: 0.16666667

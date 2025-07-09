@@ -5,6 +5,15 @@ using System.Collections;
 [RequireComponent(typeof(BezierWalkerWithSpeed))]
 public class TrainController : MonoBehaviour
 {
+    [Header("Audio")]
+    public AudioSource trainPassbyAudio;  // Assign in Inspector
+    public float minPitch = 0.1f;         // Pitch at full stop
+    public float maxPitch = 0.5f;         // Pitch at max speed
+    public float minVolume = 0.0f;        // Volume at full stop
+    public float maxVolume = 0.5f;        // Volume at max speed
+    private float currentVolume = 0f;
+    public float audioFadeSpeed = 0.1f; 
+
     [Header("Train Settings")]
     public float stopNormalizedT = 0.85f;       // Point on spline where train should stop
     public float brakeOffsetT = 0.06f;          // How early (normalizedT) to start braking
@@ -45,18 +54,20 @@ public class TrainController : MonoBehaviour
         }
         lastT = currentT;
 
-        if (isStopping || hasStoppedThisLoop)
-            return;
-
-        float brakeStartT = stopNormalizedT - brakeOffsetT;
-
-        // Only trigger if in forward half of the loop
-        if (currentT >= 0.5f && currentT >= brakeStartT && currentT <= stopNormalizedT)
+        if (!isStopping && !hasStoppedThisLoop)
         {
-            //Debug.Log($"🚉 Start braking at T = {currentT}");
-            isStopping = true;
-            StartCoroutine(SlowDownAndStop());
+            float brakeStartT = stopNormalizedT - brakeOffsetT;
+
+            if (currentT >= 0.5f && currentT >= brakeStartT && currentT <= stopNormalizedT)
+            {
+                Debug.Log($"🚉 Start braking at T = {currentT}");
+                isStopping = true;
+                StartCoroutine(SlowDownAndStop());
+            }
         }
+        
+        UpdateTrainAudio();
+
     }
 
     IEnumerator SlowDownAndStop()
@@ -73,6 +84,8 @@ public class TrainController : MonoBehaviour
 
         walker.speed = 0f;
         Debug.Log("Train stopped at T = " + walker.NormalizedT);
+
+        UpdateTrainAudio();
 
         if (pedSpawner != null)
             pedSpawner.SpawnNPCsFromTrain();
@@ -94,7 +107,37 @@ public class TrainController : MonoBehaviour
         }
 
         walker.speed = maxSpeed;
+        UpdateTrainAudio();
+
         isStopping = false;
         hasStoppedThisLoop = true;
     }
+
+    private void UpdateTrainAudio()
+    {
+        if (trainPassbyAudio == null)
+            return;
+
+        float speedRatio = Mathf.Clamp01(walker.speed / maxSpeed);
+
+        // Desired target volume and pitch
+        float targetVolume = Mathf.Lerp(minVolume, maxVolume, speedRatio);
+        float targetPitch = Mathf.Lerp(minPitch, maxPitch, speedRatio);
+
+        // Smoothly interpolate volume
+        currentVolume = Mathf.MoveTowards(currentVolume, targetVolume, Time.deltaTime * audioFadeSpeed);
+        trainPassbyAudio.volume = currentVolume;
+        trainPassbyAudio.pitch = targetPitch;
+
+        // Play or pause only when needed
+        if (currentVolume > 0.01f && !trainPassbyAudio.isPlaying)
+        {
+            trainPassbyAudio.Play();
+        }
+        else if (currentVolume <= 0.01f && trainPassbyAudio.isPlaying)
+        {
+            trainPassbyAudio.Pause();
+        }
+    }
+
 }
