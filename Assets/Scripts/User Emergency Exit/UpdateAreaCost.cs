@@ -1,4 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class UpdateAreaCost : MonoBehaviour {
     // Settings
@@ -14,6 +17,9 @@ public class UpdateAreaCost : MonoBehaviour {
         // Set area costs to 1
         AreaCost[crowd] = 1f;
         AreaCost[fire] = 1f;
+        
+        // Testing
+        StartCoroutine(UpdateAreaCostRoutine());
     }
     
     private void OnTriggerEnter(Collider other) {
@@ -50,8 +56,21 @@ public class UpdateAreaCost : MonoBehaviour {
         }
     }
     
+    /// <summary>
+    /// Returns the area costs for crowd and fire
+    /// </summary>
+    /// <returns></returns>
     public float[] GetAreaCost() {
         return AreaCost;
+    }
+    
+    // For testing purposes
+    private IEnumerator UpdateAreaCostRoutine() {
+
+        while (true) {
+            yield return new WaitForSeconds(10f);
+            Debug.Log($"{name}: {AreaCost[crowd]}, {AreaCost[fire]}");
+        }
     }
     
 }
