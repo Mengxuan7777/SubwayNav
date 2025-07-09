@@ -1,6 +1,6 @@
 using System;
 
-public static class JsonHelper
+public static partial class JsonHelper
 {
     public static string ExtractArray(string json, string key)
     {
