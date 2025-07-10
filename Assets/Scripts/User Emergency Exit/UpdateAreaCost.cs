@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using User_Emergency_Exit;
 
 public class UpdateAreaCost : MonoBehaviour {
     // Settings
@@ -7,14 +8,13 @@ public class UpdateAreaCost : MonoBehaviour {
     public bool EnableOnEntry = true, EnableOnExit = true;
     
     // Data storage
-    private const int crowd = 0,  fire = 1, fireCost = 25;
-    private readonly float[] AreaCost = new float[2];
+    private const int fireCost = 25;
+    private AreaInformation Area;
     
     // Start is called before the first frame update
     void Start() {
-        // Set area costs to 1
-        AreaCost[crowd] = 1f;
-        AreaCost[fire] = 1f;
+        // Initialize Area
+        Area = new AreaInformation(areaName);
         
         // Testing
         //StartCoroutine(UpdateAreaCostRoutine());
@@ -24,16 +24,16 @@ public class UpdateAreaCost : MonoBehaviour {
         // Increase the area cost when pedestrians trigger it.  
         if (EnableOnEntry) {
             var layer = other.gameObject.layer;
-            Debug.Log($"{name}: In contact with later {layer}");
+            //Debug.Log($"{name}: In contact with later {layer}");
             if (layer == 8) {
                 // Increase cost if there is a fire
                 var fireInfo = other.gameObject.GetComponent<FireInformation>();
-                float cost = AreaCost[crowd];
-                AreaCost[crowd] = cost + fireInfo.FireSize * fireCost;
+                float cost = Area.FireCost;
+                Area.FireCost = cost + fireInfo.FireSize * fireCost;
             } else if (layer == 9) {
                 // Increase cost if there is a pedestrian
-                float cost = AreaCost[crowd];
-                AreaCost[crowd] = cost + 0.1f;
+                float cost = Area.CrowdCost;
+                Area.CrowdCost = cost + 0.1f;
             }
         }
     }
@@ -45,12 +45,12 @@ public class UpdateAreaCost : MonoBehaviour {
             if (layer == 8) {
                 // Decrease cost if there is a fire
                 var fireInfo = other.gameObject.GetComponent<FireInformation>();
-                float cost = AreaCost[crowd];
-                AreaCost[crowd] = cost - fireInfo.FireSize * fireCost;
+                float cost = Area.FireCost;
+                Area.FireCost = cost - fireInfo.FireSize * fireCost;
             } else if (layer == 9) {
                 // Decrease cost if there is a pedestrian
-                float cost = AreaCost[crowd];
-                AreaCost[crowd] = cost - 0.1f;
+                float cost = Area.CrowdCost;
+                Area.CrowdCost = cost - 0.1f;
             }
         }
     }
@@ -59,16 +59,15 @@ public class UpdateAreaCost : MonoBehaviour {
     /// Returns the area costs for crowd and fire
     /// </summary>
     /// <returns></returns>
-    public float[] GetAreaCost() {
-        return AreaCost;
+    public AreaInformation GetAreaCost() {
+        return Area;
     }
     
     // For testing purposes
     private IEnumerator UpdateAreaCostRoutine() {
-
         while (true) {
             yield return new WaitForSeconds(0.5f);
-            Debug.Log($"{name}: {AreaCost[crowd]}, {AreaCost[fire]}");
+            Debug.Log($"{Area.AreaName}: {Area.CrowdCost}, {Area.FireCost}");
         }
     }
     

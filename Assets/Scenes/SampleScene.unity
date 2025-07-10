@@ -18230,8 +18230,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 9, y: 2, z: 4}
-  m_Center: {x: -8.834945, y: -12.529679, z: -1.8287941}
+  m_Size: {x: 13.106287, y: 4, z: 4}
+  m_Center: {x: -10.888076, y: -12.5297, z: -1.828794}
 --- !u!1001 &751458180
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19651,7 +19651,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 776072786}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41ba4693e58811f42a6ff19a4335d2dd, type: 3}
   m_Name: 
@@ -19663,6 +19663,12 @@ MonoBehaviour:
   - {fileID: 345838817}
   - {fileID: 905105713}
   - {fileID: 1265924237}
+  - {fileID: 7965234229631138810}
+  - {fileID: 8353232945922413813}
+  - {fileID: 2121565818}
+  - {fileID: 946262298}
+  - {fileID: 8880484999793094206}
+  - {fileID: 750857655}
 --- !u!4 &776072788
 Transform:
   m_ObjectHideFlags: 0
@@ -24561,8 +24567,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 9, y: 2, z: 4}
-  m_Center: {x: -8.834936, y: -12.52968, z: -1.8287945}
+  m_Size: {x: 20.610523, y: 4, z: 4.5659485}
+  m_Center: {x: -13.765551, y: -12.52968, z: -1.4086204}
 --- !u!1 &952430880
 GameObject:
   m_ObjectHideFlags: 0
@@ -37732,6 +37738,7 @@ GameObject:
   - component: {fileID: 1485915728}
   - component: {fileID: 1485915727}
   - component: {fileID: 1485915729}
+  - component: {fileID: 1485915730}
   m_Layer: 0
   m_Name: StationNodesHdl
   m_TagString: Untagged
@@ -37793,6 +37800,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stationJsonFileName: station_nodes.json
   outputFileName: navmesh_distances.json
+--- !u!114 &1485915730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485915726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41ba4693e58811f42a6ff19a4335d2dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  areas:
+  - {fileID: 2123355298}
+  - {fileID: 1574434171}
+  - {fileID: 898583392}
+  - {fileID: 345838817}
+  - {fileID: 905105713}
+  - {fileID: 1265924237}
+  - {fileID: 7965234229631138810}
+  - {fileID: 8353232945922413813}
+  - {fileID: 2121565818}
+  - {fileID: 946262298}
+  - {fileID: 8880484999793094206}
+  - {fileID: 750857655}
 --- !u!1 &1504098818
 GameObject:
   m_ObjectHideFlags: 0
@@ -52941,8 +52973,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 9, y: 2, z: 4}
-  m_Center: {x: -8.834929, y: -12.529679, z: -1.8287941}
+  m_Size: {x: 15.375637, y: 4, z: 3.8348322}
+  m_Center: {x: -12.022733, y: -12.529725, z: -1.7462101}
 --- !u!1 &2121982738
 GameObject:
   m_ObjectHideFlags: 0
@@ -467884,8 +467916,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 9, y: 2, z: 4}
-  m_Center: {x: -8.65207, y: -12.529679, z: -1.8287946}
+  m_Size: {x: 19.384653, y: 4, z: 5.063297}
+  m_Center: {x: -14.581847, y: -12.529679, z: -1.142796}
 --- !u!23 &7965408801292618874
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -488900,8 +488932,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 9, y: 2, z: 4}
-  m_Center: {x: -36.646263, y: -13.004308, z: -1.8287947}
+  m_Size: {x: 14.213585, y: 4, z: 3.8628004}
+  m_Center: {x: -39.253056, y: -13.004308, z: -1.7601949}
 --- !u!33 &8353523789444800132
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -515621,8 +515653,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 9, y: 2, z: 4}
-  m_Center: {x: -37.13836, y: 0.36359692, z: -1.8287947}
+  m_Size: {x: 13.33894, y: 4, z: 4}
+  m_Center: {x: -39.30783, y: 0.36359692, z: -1.8287947}
 --- !u!23 &8880662858314081253
 MeshRenderer:
   m_ObjectHideFlags: 0
