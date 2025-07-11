@@ -4,10 +4,14 @@ using Random = System.Random;
 
 public class ObstacleSpawner : MonoBehaviour {
     // Start is called before the first frame update
+    [Header("Fire Locations")]
     public GameObject[] obstacles;
     
     // Prevent multiple spawns
-    private bool isSpawning = false; 
+    [Header("Spawn Settings")]
+    private bool isSpawning = false;
+    public int fireIndex = -1;
+    public float fireSize = 0;
     
     // Random Generator
     private readonly Random rnd = new Random();
@@ -30,10 +34,17 @@ public class ObstacleSpawner : MonoBehaviour {
         int wait = rnd.Next(1, 4);
         yield return new WaitForSeconds(wait);
         
-        // pick a random obstacle
-        var rndObstacle = rnd.Next(0, obstacles.Length);
-        //var rndObstacle = 5;
-        GameObject selectedObstacle = obstacles[rndObstacle];
+        // Pick a random obstacle, if not defined
+        if (fireIndex == -1) {
+            fireIndex = rnd.Next(0, obstacles.Length);
+        }
+        GameObject selectedObstacle = obstacles[fireIndex];
         selectedObstacle.SetActive(true);
+        
+        
+        // Change size of fire if was pre-determined
+        if (fireSize != 0) {
+            selectedObstacle.transform.localScale = new Vector3(fireSize, fireSize, fireSize);
+        }
     }
 }

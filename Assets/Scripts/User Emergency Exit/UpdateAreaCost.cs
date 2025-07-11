@@ -14,7 +14,7 @@ public class UpdateAreaCost : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         // Initialize Area
-        Area = new AreaInformation(areaName);
+        Area = new AreaInformation(areaName);  
         
         // Testing
         //StartCoroutine(UpdateAreaCostRoutine());
