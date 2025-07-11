@@ -828,6 +828,7 @@ GameObject:
   - component: {fileID: 7014502658288381124}
   - component: {fileID: 535958040359754752}
   - component: {fileID: -670374274153412652}
+  - component: {fileID: 5200293337720911414}
   m_Layer: 9
   m_Name: f4
   m_TagString: Untagged
@@ -944,6 +945,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &5200293337720911414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6270895591748109422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd2a79f98d775bf40bb5144ba0aff5b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  waypoints: []
+  loop: 0
 --- !u!1 &6504645318732738991
 GameObject:
   m_ObjectHideFlags: 0

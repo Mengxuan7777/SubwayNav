@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-public class PedSpawner : MonoBehaviour
-{
+public class PedestrianSpawner : MonoBehaviour {
+    
     [Header("Pedestrian Prefabs")]
     public GameObject[] pedestrianPrefabs;
 
@@ -12,21 +12,17 @@ public class PedSpawner : MonoBehaviour
     public int npcsPerSpawnPoint = 5;
     public float spawnInterval = 2f;      // Delay between spawns per point
 
-    public void SpawnNPCsFromTrain()
-    {
+    public void SpawnNPCsFromTrain() {
         // Start coroutine for each spawn point
-        for (int i = 0; i < spawnPoints.Length; i++)
-        {
+        for (int i = 0; i < spawnPoints.Length; i++) {
             StartCoroutine(SpawnFromPoint(i));
         }
     }
 
-    private IEnumerator SpawnFromPoint(int spawnIndex)
-    {
+    private IEnumerator SpawnFromPoint(int spawnIndex) {
         Transform spawnPoint = spawnPoints[spawnIndex];
 
-        for (int i = 0; i < npcsPerSpawnPoint; i++)
-        {
+        for (int i = 0; i < npcsPerSpawnPoint; i++) {
             // Pick random prefab
             GameObject selectedPrefab = pedestrianPrefabs[Random.Range(0, pedestrianPrefabs.Length)];
             Vector3 spawnPosition = spawnPoint.position;
@@ -35,14 +31,12 @@ public class PedSpawner : MonoBehaviour
             GameObject pedestrian = Instantiate(selectedPrefab, spawnPosition, Quaternion.identity);
 
             // Assign random path
-            WaypointFollower follower = pedestrian.GetComponent<WaypointFollower>();
-            if (follower != null && pathParents.Length > 0)
-            {
+            PedestrianMovement follower = pedestrian.GetComponent<PedestrianMovement>();
+            if (follower != null && pathParents.Length > 0) {
                 Transform pathParent = pathParents[Random.Range(0, pathParents.Length)];
                 Transform[] waypoints = new Transform[pathParent.childCount];
 
-                for (int j = 0; j < waypoints.Length; j++)
-                {
+                for (int j = 0; j < waypoints.Length; j++) {
                     waypoints[j] = pathParent.GetChild(j);
                 }
 

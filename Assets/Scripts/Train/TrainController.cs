@@ -1,6 +1,7 @@
 using UnityEngine;
 using BezierSolution;
 using System.Collections;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(BezierWalkerWithSpeed))]
 public class TrainController : MonoBehaviour
@@ -21,8 +22,8 @@ public class TrainController : MonoBehaviour
     public float maxSpeed = 50f;                // Top speed
     public float accelerationTime = 3f;         // Time to speed up or slow down
 
-    [Header("NPC Spawner")]
-    public PedSpawner pedSpawner;
+    [FormerlySerializedAs("pedSpawner")] [Header("NPC Spawner")]
+    public PedestrianSpawner pedestrianSpawner;
 
     private BezierWalkerWithSpeed walker;
     private float lastT = 0f;
@@ -87,8 +88,8 @@ public class TrainController : MonoBehaviour
 
         UpdateTrainAudio();
 
-        if (pedSpawner != null)
-            pedSpawner.SpawnNPCsFromTrain();
+        if (pedestrianSpawner != null)
+            pedestrianSpawner.SpawnNPCsFromTrain();
 
         yield return new WaitForSeconds(stopDuration);
 

@@ -81,7 +81,7 @@ public class NavMeshDistanceExporter : MonoBehaviour
                         total += Vector3.Distance(path.corners[i - 1], path.corners[i]);
 
                     map.distances.Add(new NodeDistance { from = fromName, to = toName, distance = total });
-                    Debug.Log($"✅ {fromName} -> {toName}: {total:F2}");
+                    //Debug.Log($"✅ {fromName} -> {toName}: {total:F2}");
                 }
                 else
                     Debug.LogWarning($"❌ Failed to find path: {fromName} -> {toName}");
