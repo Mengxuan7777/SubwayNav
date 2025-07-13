@@ -529,6 +529,7 @@ GameObject:
   - component: {fileID: 30259476}
   - component: {fileID: 30259475}
   - component: {fileID: 30259474}
+  - component: {fileID: 30259477}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -624,6 +625,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 30259472}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &30259477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 30259472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ac11be6d4ed9cf4cb38afbc171c8bad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collisionWithFire: 0
+  collisionWithPedestrian: 0
 --- !u!1 &30505667
 GameObject:
   m_ObjectHideFlags: 0
@@ -40778,13 +40793,14 @@ GameObject:
   - component: {fileID: 1620936481}
   - component: {fileID: 1620936484}
   - component: {fileID: 1620936485}
+  - component: {fileID: 1620936486}
   m_Layer: 0
   m_Name: Agent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1620936477
 Transform:
   m_ObjectHideFlags: 0
@@ -40978,6 +40994,26 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1620936486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1620936476}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8ed908ff97a8784f9096c62aab1696e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 1620936485}
+  Exists:
+  - {fileID: 278725359}
+  - {fileID: 1170969403}
+  - {fileID: 1336534765}
+  - {fileID: 853628519}
+  waypoint: {fileID: 8534186802305528861, guid: b53644d4515bba346bc43e44e78c70ba, type: 3}
+  connector: {fileID: 6233964292022993138, guid: 849cf4f6399c57140969e64720098561, type: 3}
 --- !u!1 &1626558774
 GameObject:
   m_ObjectHideFlags: 0

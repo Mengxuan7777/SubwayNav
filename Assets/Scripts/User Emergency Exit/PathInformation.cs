@@ -5,10 +5,9 @@ namespace User_Emergency_Exit {
         public float Distance;
         public float[] DistanceToFire;
         
-        public PathInformation(int id, float distance, float[] distanceToFire) {
+        public PathInformation(int id, float distance) {
             ID = id;
             Distance = distance;
-            DistanceToFire = distanceToFire;
         }
     }
 }
