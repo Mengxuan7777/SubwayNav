@@ -22847,8 +22847,8 @@ MonoBehaviour:
   - {fileID: 1295853786}
   - {fileID: 72240650}
   - {fileID: 1764433502}
-  fireIndex: 0
-  fireSize: 0
+  fireIndex: 10
+  fireSize: 0.5
 --- !u!1 &914064311
 GameObject:
   m_ObjectHideFlags: 0
@@ -40800,7 +40800,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1620936477
 Transform:
   m_ObjectHideFlags: 0
@@ -52722,16 +52722,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b42af3c74387c964d83ec8f2ee773d3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 2138499537}
-  Exists:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  waypoint: {fileID: 8534186802305528861, guid: b53644d4515bba346bc43e44e78c70ba, type: 3}
-  connector: {fileID: 6233964292022993138, guid: 849cf4f6399c57140969e64720098561, type: 3}
-  _container: {fileID: 0}
-  apiKey: 
 --- !u!1 &2138955217 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 329b2a7b22bab1f4dbe832c876bda154, type: 3}
