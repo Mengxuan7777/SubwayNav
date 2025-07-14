@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class PenaltyCounter : MonoBehaviour {
     // Start is called before the first frame update
-    [Header("Penalty Counters")]
-    public int collisionWithFire, collisionWithPedestrian;
+    [Header("Penalty Counters")] 
+    public int collisionWithFire;
+    public int collisionWithPedestrian;
     
     [Header("Log Settings")]
-    public string LogPath = "C:/Users/tower/Documents/Unity Projects/SubwayNav/Assets/Logs/" ;
+    public string LogPath = "Users/tower/Documents/Unity Projects/SubwayNav/Assets/Logs/" ;
     private StreamWriter writer;
 
     private void Start() {
         // Create a new file name
         string fileName = "penalty_counter_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".csv";
         
-        // Create a new streamwriter
+        // Create a new stream writer
         try {
             writer = new StreamWriter(LogPath + fileName);
         } catch (DirectoryNotFoundException) {
