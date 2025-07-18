@@ -4,7 +4,7 @@ import os
 import json
 import re
 
-with open("C:/Users/jessl/Downloads/api_key.txt", "r") as f:
+with open("C:/Users/tower/Documents/OpenAI_ChatGPT_Key.txt", "r") as f:
     api_key = f.read().strip()
 
 client = OpenAI(api_key=api_key)

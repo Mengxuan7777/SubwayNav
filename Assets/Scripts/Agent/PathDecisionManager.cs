@@ -23,7 +23,7 @@ public class PathDecisionManager : MonoBehaviour
     private IEnumerator GetPathFromServer(Vector3 position)
     {
         string json = JsonUtility.ToJson(new PositionPayload(position));
-        UnityWebRequest req = UnityWebRequest.Put("http://localhost:5001/path", json);
+        UnityWebRequest req = UnityWebRequest.Put("http://localhost:5000/path", json);
         req.method = UnityWebRequest.kHttpVerbPOST;
         req.SetRequestHeader("Content-Type", "application/json");
 
