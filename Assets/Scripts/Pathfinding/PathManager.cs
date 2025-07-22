@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -8,26 +9,73 @@ namespace Pathfinding {
         public GameObject Agent;
         private NavMeshAgent AgentNavMesh;
         
-    
         // Nodes 
+        public StationNode StartNodeObj;
         private Node StartNode;
-        public List<Node> Nodes;
-        public List<Node> Exits;
+        public StationNode[] Nodes, Exits;
+        private readonly List<Node> ExitsList = new ();
+        private int NodeCount;
         
-        // Settings
-
+        // Pathfinding
+        private readonly AStar pathfinder = new AStar();
+        private bool isPathfinding = false;
 
         private void Awake() {
             // Gather agent info
             AgentNavMesh = Agent.GetComponent<NavMeshAgent>();
-            StartNode = new Node("Start", Agent.transform.position);
+            StartNode = StartNodeObj.node;
+            
+            // Gather Information Regarding Nodes
+            NodeCount = Nodes.Length;
+        }
+
+        private void Start()
+        {
+            // Create Node List
+            foreach (var t in Exits) {
+                ExitsList.Add(t.node);
+            }
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown((KeyCode.A)) && !isPathfinding) {
+                ReCalculatePath();
+                isPathfinding = true;
+            }
         }
 
 
+        /// <summary>
+        /// Recalculates the path based on the new edge weights.
+        /// </summary>
+        private void ReCalculatePath() { 
+            List<Node> path = pathfinder.FindPath(NodeCount, StartNode, ExitsList);
+            foreach (var node in path)
+            {
+                Debug.Log($"[{node.Position.x}, {node.Position.y}, {node.Position.z}]");
+            }
+        }
         
-        private void UpdateEdgeWeight(Node node, float newWeight) {
+        /// <summary>
+        /// Updates all edge weights for a given node.
+        /// Yes, this runs in O(N^2) time. However, in the worst-case scenario N=6,
+        /// which means this basically runs in basically O(1).
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="crowdCost"></param>
+        /// <param name="fireCost"></param>
+        private void UpdateEdgeWeight(Node node, float crowdCost, float fireCost) {
             foreach (var edge in node.Edges) {
-                edge.Weight = newWeight;
+                // Update the outgoing edge weight
+                edge.Weight = edge.DistanceCost + crowdCost + fireCost;
+                
+                // Update the incoming edge weight
+                foreach (var NBREdge in edge.TargetNode.Edges) {
+                    if (NBREdge.TargetNode == node) {
+                        NBREdge.Weight = edge.Weight;
+                    }
+                }
             }
         }
 

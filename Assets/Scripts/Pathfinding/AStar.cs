@@ -11,7 +11,7 @@ namespace Pathfinding {
         /// <param name="start">Starting Node</param>
         /// <param name="targets">Exit Nodes (Always 4 total)</param>
         /// <returns>Path in the form of a Vector3 list.</returns>
-        public static List<Node> FindPath(int nodeCount, Node start, List<Node> targets) {
+        public List<Node> FindPath(int nodeCount, Node start, List<Node> targets) {
             // Create set for nodes to explore (openSet) and sets for the cost to reach node (gScore),
             // cost to reach target (fScore), and denote where a node came from (cameFrom).
             var openSet = new FastPriorityQueue<Node>(nodeCount); 
@@ -90,7 +90,9 @@ namespace Pathfinding {
         }
     }
     
-    
+    /// <summary>
+    /// Node Class
+    /// </summary>
     public class Node : FastPriorityQueueNode {
         // Parameters
         public new string name;
@@ -102,15 +104,12 @@ namespace Pathfinding {
             this.name = name;
             Position = position;
         }
-        
-        // Update Weight Cost
-        private void UpdateEdgeWeight(float crowdCost, float fireCost) {
-            foreach (var edge in Edges) {
-                edge.Weight = edge.DistanceCost + crowdCost + fireCost;;
-            }
-        }
     }
     
+    
+    /// <summary>
+    /// Edge utility class 
+    /// </summary>
     public class Edge {
         // Parameters
         public Node TargetNode;
