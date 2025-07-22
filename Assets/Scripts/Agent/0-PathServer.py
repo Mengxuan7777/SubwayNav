@@ -4,7 +4,7 @@ import json
 from openai import OpenAI
 import re
 
-with open("C:/Users/jessl/Downloads/api_key.txt", "r") as f:
+with open("C:/Users/tower/Documents/OpenAI_ChatGPT_Key.txt", "r") as f:
     api_key = f.read().strip()
 
 client = OpenAI(api_key=api_key)
@@ -14,7 +14,7 @@ EXIT_NODES = ["EX1", "EX2", "EX3", "EX4"]
 AGENT_NODE = "Agent"
 
 # === LOAD STATION DATA ===
-with open("../Nodes/station_nodes.json", "r") as f:
+with open(r"C:\Users\tower\Documents\Unity Projects\SubwayNav\Assets\Nodes\station_nodes.json", "r") as f:
     node_positions = {
         node["name"]: (node["x"], node["y"], node["z"])
         for node in json.load(f)["nodes"]
