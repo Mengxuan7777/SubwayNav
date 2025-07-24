@@ -1,80 +1,41 @@
 using System;
 using System.Collections;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.Recorder;
-using UnityEditor.Recorder.Input;
+using System.IO;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Camera {
     public class CameraManager : MonoBehaviour {
         [Header("Cameras")]
         public UnityEngine.Camera[] cameras;
-        private RecorderController[] recorders; // [ cameras.Length]
-    
-        [Header("Recording Settings")]
-        [Tooltip("To start recording automatically when the play button is pressed")] 
-        public bool AutomaticRecording = true;
-        [Tooltip("Interval between recordings in seconds.")] 
-        public float RecordingInterval = 60f;
-        [Tooltip("Duration of recordings in seconds.")] 
-        public float RecordingDuration = 10f;
-        public float FrameRate = 30f;
+
+        [Header("Screenshot Settings")]
+        [Tooltip("Take screenshots automatically when the play button is pressed")] 
+        public bool AutomaticScreenshot = true;
+        [Tooltip("Interval between screenshots in seconds.")] 
+        public float ScreenshotInterval = 30f;
         [Tooltip("Options: 1080p, 720p, 480p. Defaults to 720p.")] 
         public string Resolution = "720p";
+        [Tooltip("Options: png or jpg. Defaults to jpg.")] 
+        public string FileFormat = "jpg";
+        public string FolderPath ;
         private int width, height;
-       
-        void Start() {
-            // Generate recorders
+
+
+        private void Awake() {
+            // Set up
+            FolderPath = Application.persistentDataPath + "/Screenshots"; 
             SetResolution();
-            GenerateRecorders();
-            
-            // Start Recording from the start
-            if (AutomaticRecording) {
-                StartCoroutine(RecordRoutine());
-            }
-           
         }
         
-        private void GenerateRecorders() {
-        #if UNITY_EDITOR
-            recorders = new RecorderController[cameras.Length];
-            for (int i = 0; i < cameras.Length; i++) {
-                // Recorder Settings
-                var cameraControllerSettings = ScriptableObject.CreateInstance<RecorderControllerSettings>();
-                cameraControllerSettings.ExitPlayMode = false;
-                cameraControllerSettings.FrameRate = FrameRate;
-                
-                // Video Settings
-                var movieRecorder = ScriptableObject.CreateInstance<MovieRecorderSettings>();
-                movieRecorder.name = cameras[i].name + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                movieRecorder.Enabled = true;
-                movieRecorder.ImageInputSettings = new CameraInputSettings {
-                    Source = ImageSource.TaggedCamera,
-                    CameraTag = cameras[i].tag,
-                    OutputHeight = height,
-                    OutputWidth = width,
-                    FlipFinalOutput = true // Ensures video is not flipped.
-                };
-                
-                // Video File Settings
-                movieRecorder.OutputFormat = MovieRecorderSettings.VideoRecorderOutputFormat.MP4;
-                movieRecorder.VideoBitRateMode = VideoBitrateMode.Medium;
-                movieRecorder.CaptureAudio = false; // Reduce file size 
-                movieRecorder.OutputFile = $"Recordings/{movieRecorder.name}";
-
-                cameraControllerSettings.AddRecorderSettings(movieRecorder);
-                cameraControllerSettings.SetRecordModeToManual();
-                
-                // Add recorders to list
-                recorders[i] = new RecorderController(cameraControllerSettings);
+        void Start() {
+            // Take screenshots automatically when the play button is pressed.
+            if (AutomaticScreenshot) {
+                StartCoroutine(ScreenshotRoutine());
             }
-        #endif
         }
 
         /// <summary>
-        /// Determines the resolution based on what the user wants. 
+        /// Determines the resolution of the pictures based on input string
         /// </summary>
         private void SetResolution() {
             switch (Resolution) {
@@ -87,58 +48,56 @@ namespace Camera {
                 case "480p":
                     width = 854; height = 480;
                     break;
-                default: // Defaults to 720p
+                default:
                     width = 1280; height = 720;
                     Debug.LogWarning($"{Resolution} is not a valid resolution. Resolution set to 720p.");
                     break;
             }
         }
-
-        /// <summary>
-        /// Records clips to use with VLM.
-        /// </summary>
-        /// <returns>Fake returns.</returns>
-        private IEnumerator RecordRoutine() {
-            while (true) {
-                // Start 10 sec recording
-                StartAllRecordings();
-                yield return new WaitForSeconds(RecordingDuration);
-                
-                // Stop recording and wait a minute
-                StopAllRecordings();
-                yield return new WaitForSeconds(RecordingInterval);
-            }
-        }
         
-        /// <summary>
-        /// Start all recordings for all cameras
-        /// </summary>
-        private void StartAllRecordings() {
-        #if UNITY_EDITOR
-            if (recorders == null) return;
-            foreach (var controller in recorders) {
-                if (controller != null && controller.IsRecording() == false) {
-                    controller.PrepareRecording();
-                    controller.StartRecording();
-
-                }
+        
+        private IEnumerator ScreenshotRoutine() {
+            while (true) {
+                yield return StartCoroutine(TakeScreenshots());
+                yield return new WaitForSeconds(ScreenshotInterval);
             }
-        #endif
         }
 
-        /// <summary>
-        /// Stops all recordings
-        /// </summary>
-        private void StopAllRecordings() {
-        #if UNITY_EDITOR
-            if (recorders == null) return;
-            foreach (var controller in recorders) {
-                if (controller != null && controller.IsRecording()) {
-                    controller.StopRecording();
-                }
+        private IEnumerator TakeScreenshots() {
+            for (int i = 0; i < cameras.Length; i++) {
+                yield return StartCoroutine(CaptureCameraScreenshot(cameras[i], i));
             }
-        #endif
- 
+        }
+
+        private IEnumerator CaptureCameraScreenshot(UnityEngine.Camera cam, int index) {
+            // Set up RenderTexture
+            RenderTexture rt = new RenderTexture(width, height, 24);
+            cam.targetTexture = rt;
+            Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
+
+            cam.Render();
+            RenderTexture.active = rt;
+            screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+            screenshot.Apply();
+
+            cam.targetTexture = null;
+            RenderTexture.active = null;
+            Destroy(rt);
+
+            // Save file
+            if (!Directory.Exists(FolderPath)) {
+                Directory.CreateDirectory(FolderPath);
+                Debug.Log($"New Directory Created: {FolderPath}");
+            }
+            
+            string fileName = $"{cam.name}_{DateTime.Now:yyyyMMdd_HHmmss}.{FileFormat}";
+            string fullPath = Path.Combine(FolderPath, fileName);
+
+            if (FileFormat == "jpg") {
+                File.WriteAllBytes(fullPath, screenshot.EncodeToJPG());
+            }
+            File.WriteAllBytes(fullPath, screenshot.EncodeToPNG());
+            yield return null;
         }
     }
 }
