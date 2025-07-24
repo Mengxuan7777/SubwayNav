@@ -22,8 +22,13 @@ namespace Camera {
 
 
         private void Awake() {
-            // Set up
+            // Create File Directory
             FolderPath = Application.persistentDataPath + "/Screenshots"; 
+            if (!Directory.Exists(FolderPath)) {
+                Directory.CreateDirectory(FolderPath);
+                Debug.Log($"New Directory Created: {FolderPath}");
+            }
+            // Set resolution
             SetResolution();
         }
         
@@ -32,6 +37,15 @@ namespace Camera {
             if (AutomaticScreenshot) {
                 StartCoroutine(ScreenshotRoutine());
             }
+        }
+
+        private void OnDisable() {
+            // Delete all generated screenshots
+            string[] files = Directory.GetFiles(FolderPath, $"*.{FileFormat}");
+            foreach (var file in files) {
+                File.Delete(file);
+            }
+
         }
 
         /// <summary>
@@ -55,49 +69,42 @@ namespace Camera {
             }
         }
         
-        
         private IEnumerator ScreenshotRoutine() {
             while (true) {
-                yield return StartCoroutine(TakeScreenshots());
+                TakeScreenshots();
                 yield return new WaitForSeconds(ScreenshotInterval);
             }
+            // ReSharper disable once IteratorNeverReturns
         }
 
-        private IEnumerator TakeScreenshots() {
-            for (int i = 0; i < cameras.Length; i++) {
-                yield return StartCoroutine(CaptureCameraScreenshot(cameras[i], i));
+        /// <summary>
+        /// Takes a picture in each of the cameras
+        /// </summary>
+        private void TakeScreenshots() {
+            foreach (var cam in cameras) {
+                // Set up RenderTexture
+                RenderTexture rt = new RenderTexture(width, height, 24);
+                cam.targetTexture = rt;
+                Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
+
+                cam.Render();
+                RenderTexture.active = rt;
+                screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+                screenshot.Apply();
+
+                cam.targetTexture = null;
+                RenderTexture.active = null;
+                Destroy(rt);
+
+                // Save file
+                string fileName = $"{cam.name}_{DateTime.Now:yyyyMMdd_HHmmss}.{FileFormat}";
+                string fullPath = Path.Combine(FolderPath, fileName);
+
+                if (FileFormat == "jpg") {
+                    File.WriteAllBytes(fullPath, screenshot.EncodeToJPG());
+                }
+                File.WriteAllBytes(fullPath, screenshot.EncodeToPNG());
             }
-        }
-
-        private IEnumerator CaptureCameraScreenshot(UnityEngine.Camera cam, int index) {
-            // Set up RenderTexture
-            RenderTexture rt = new RenderTexture(width, height, 24);
-            cam.targetTexture = rt;
-            Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
-
-            cam.Render();
-            RenderTexture.active = rt;
-            screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-            screenshot.Apply();
-
-            cam.targetTexture = null;
-            RenderTexture.active = null;
-            Destroy(rt);
-
-            // Save file
-            if (!Directory.Exists(FolderPath)) {
-                Directory.CreateDirectory(FolderPath);
-                Debug.Log($"New Directory Created: {FolderPath}");
-            }
-            
-            string fileName = $"{cam.name}_{DateTime.Now:yyyyMMdd_HHmmss}.{FileFormat}";
-            string fullPath = Path.Combine(FolderPath, fileName);
-
-            if (FileFormat == "jpg") {
-                File.WriteAllBytes(fullPath, screenshot.EncodeToJPG());
-            }
-            File.WriteAllBytes(fullPath, screenshot.EncodeToPNG());
-            yield return null;
         }
     }
 }
