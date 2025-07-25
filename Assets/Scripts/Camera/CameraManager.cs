@@ -19,8 +19,7 @@ namespace Camera {
         public string FileFormat = "jpg";
         public string FolderPath ;
         private int width, height;
-
-
+        
         private void Awake() {
             // Create File Directory
             FolderPath = Application.persistentDataPath + "/Screenshots"; 
