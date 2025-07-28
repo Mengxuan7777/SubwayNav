@@ -1,13 +1,21 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Camera {
     public class CameraManager : MonoBehaviour {
+        // Camera References & Info
         [Header("Cameras")]
         public UnityEngine.Camera[] cameras;
+        private RenderTexture[] cameraRenderTextures;
+        private Texture2D[] cameraTextures;
+        private readonly object fileLock = new ();
 
+        // Settings
         [Header("Screenshot Settings")]
         [Tooltip("Take screenshots automatically when the play button is pressed")] 
         public bool AutomaticScreenshot = true;
@@ -15,23 +23,37 @@ namespace Camera {
         public float ScreenshotInterval = 30f;
         [Tooltip("Options: 1080p, 720p, 480p. Defaults to 720p.")] 
         public string Resolution = "720p";
+        private int width, height;
         [Tooltip("Options: png or jpg. Defaults to jpg.")] 
         public string FileFormat = "jpg";
-        public string FolderPath ;
-        private int width, height;
+        
+        // Storage of Images
+        private static string path;
+        public string FolderPath;
+        private int folderCount;
+        private int gpuReadbacksInProgress = 0;
+        private const int MaxConcurrentReadbacks = 2;
+
         
         private void Awake() {
-            // Create File Directory
-            FolderPath = Application.persistentDataPath + "/Screenshots"; 
-            if (!Directory.Exists(FolderPath)) {
-                Directory.CreateDirectory(FolderPath);
-                Debug.Log($"New Directory Created: {FolderPath}");
+            // Create primary folder is not already created
+            path = Application.persistentDataPath + "/Screenshots/";
+            if (!Directory.Exists(path)) {
+                Directory.CreateDirectory(path);
+                Debug.Log($"New Directory Created: {path}");
             }
-            // Set resolution
+            
+            // Configure Cameras
             SetResolution();
+            InitializeTextures();
         }
         
         void Start() {
+            // Set textures to cameras
+            for (int i = 0; i < cameras.Length; i++) {
+                cameras[i].targetTexture = cameraRenderTextures[i];
+            }
+            
             // Take screenshots automatically when the play button is pressed.
             if (AutomaticScreenshot) {
                 StartCoroutine(ScreenshotRoutine());
@@ -40,13 +62,108 @@ namespace Camera {
 
         private void OnDisable() {
             // Delete all generated screenshots
-            string[] files = Directory.GetFiles(FolderPath, $"*.{FileFormat}");
-            foreach (var file in files) {
-                File.Delete(file);
+            string[] dirs = Directory.GetDirectories(path);
+            foreach (var dir in dirs) {
+                Directory.Delete(dir, true); 
+            }
+        }
+        
+        /// <summary>
+        /// Routinely take screenshots of all cameras in a folder.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator ScreenshotRoutine() {
+            // Continuously take screenshots until the play button is pressed
+            while (true) {
+                // Create a new folder for the screenshots
+                FolderPath = Path.Combine(path, "Folder" + folderCount++);
+                if (!Directory.Exists(FolderPath)) {
+                    Directory.CreateDirectory(FolderPath);
+                }
+                
+                // Take screenshots
+                yield return TakeScreenshots();
+                Debug.Log($"Finished taking screenshots of all {cameras.Length} cameras. Saved to: {FolderPath}");
+               
+                // Delete old folder to make up space
+                DeleteOldFolders();
+                
+                // Wait
+                yield return new WaitForSeconds(ScreenshotInterval);
+            }
+            // ReSharper disable once IteratorNeverReturns
+        }
+
+        /// <summary>
+        /// Takes a picture in each of the cameras in quick succession
+        /// Warning: This only works in Unity 2018.2+
+        /// </summary>
+        private IEnumerator TakeScreenshots() {
+            for (int i = 0; i < cameras.Length; i++) {
+                // Wait until you have a slot for a new request
+                while (gpuReadbacksInProgress >= MaxConcurrentReadbacks)
+                    yield return null;
+
+                UnityEngine.Camera cam = cameras[i];
+                var rt = cameraRenderTextures[i];
+                cam.targetTexture = rt;
+                cam.Render();
+                cam.targetTexture = null;
+
+                // Start async GPU texture readback
+                var cameraIndex = i;
+                gpuReadbacksInProgress++;
+                AsyncGPUReadback.Request(rt, 0, TextureFormat.RGB24, (req) => {
+                    if (!req.hasError) {
+                        // Gets raw texture data
+                        var tex = cameraTextures[cameraIndex];
+                        tex.LoadRawTextureData(req.GetData<byte>());
+                        tex.Apply();
+                        
+                        // Determine encoding
+                        byte[] imageBytes = (FileFormat.ToLower() == "jpg")
+                            ? tex.EncodeToJPG()
+                            : tex.EncodeToPNG();
+                        
+                        // Create filepath
+                        string fileName = $"{cam.name}.{FileFormat}";
+                        string fullPath = Path.Combine(FolderPath, fileName);
+
+                        // Threaded file write
+                        ThreadPool.QueueUserWorkItem(_ => {
+                            File.WriteAllBytes(fullPath, imageBytes);
+                        });
+                        Destroy(tex);
+                    }
+                    gpuReadbacksInProgress--;
+                });
+            }
+            // Wait for any remaining readbacks to fully complete
+            while (gpuReadbacksInProgress > 0)
+                yield return null;
+        }
+        
+        /// <summary>
+        /// Delete the oldest folder if there are more than 5 folders
+        /// </summary>
+        private async void DeleteOldFolders() {
+            try {
+                await Task.Run(() => {
+                    string[] folders = Directory.GetDirectories(path);
+                    // Only keep the latest 5 folders
+                    if (folders.Length > 5) {
+                        Array.Sort(folders); // Sort by name (assumes Folder0, Folder1, ...)
+                        for (int i = 0; i < folders.Length - 5; i++) {
+                            Directory.Delete(folders[i], true);
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                //Debug.LogWarning("Error deleting old screenshot folders: " + e.Message);
             }
 
         }
-
+        
         /// <summary>
         /// Determines the resolution of the pictures based on input string
         /// </summary>
@@ -68,41 +185,15 @@ namespace Camera {
             }
         }
         
-        private IEnumerator ScreenshotRoutine() {
-            while (true) {
-                TakeScreenshots();
-                yield return new WaitForSeconds(ScreenshotInterval);
-            }
-            // ReSharper disable once IteratorNeverReturns
-        }
-
         /// <summary>
-        /// Takes a picture in each of the cameras
+        /// Initializes the render textures for all cameras.
         /// </summary>
-        private void TakeScreenshots() {
-            foreach (var cam in cameras) {
-                // Set up RenderTexture
-                RenderTexture rt = new RenderTexture(width, height, 24);
-                cam.targetTexture = rt;
-                Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
-
-                cam.Render();
-                RenderTexture.active = rt;
-                screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-                screenshot.Apply();
-
-                cam.targetTexture = null;
-                RenderTexture.active = null;
-                Destroy(rt);
-
-                // Save file
-                string fileName = $"{cam.name}_{DateTime.Now:yyyyMMdd_HHmmss}.{FileFormat}";
-                string fullPath = Path.Combine(FolderPath, fileName);
-
-                if (FileFormat == "jpg") {
-                    File.WriteAllBytes(fullPath, screenshot.EncodeToJPG());
-                }
-                File.WriteAllBytes(fullPath, screenshot.EncodeToPNG());
+        private void InitializeTextures() {
+            cameraRenderTextures = new RenderTexture[cameras.Length];
+            cameraTextures = new Texture2D[cameras.Length];
+            for (int i = 0; i < cameras.Length; i++) {
+                cameraRenderTextures[i] = new RenderTexture(width, height, 24);
+                cameraTextures[i] = new Texture2D(width, height, TextureFormat.RGB24, false);
             }
         }
     }
