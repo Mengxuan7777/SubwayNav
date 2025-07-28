@@ -5,9 +5,11 @@ import sys
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Get the API key
+# Get the API key & set client
 with open("C:/Users/tower/Documents/API Keys/OpenAI_ChatGPT_Key.txt", "r") as f:
-    openai.api_key = f.read().strip()
+    api_key = f.read().strip()
+client = openai.OpenAI(api_key=api_key)
+
 
 # Encode images
 def encode_image(image_path):
@@ -23,17 +25,16 @@ def analyze_images(image_paths, prompt):
         }
         for img in image_paths
     ]
-    response = openai.ChatCompletion.create(
-        model="gpt-4-vision-preview",
-        messages=[
-            {
-                "role": "user",
-                "content": [{"type": "text", "text": prompt}] + image_contents
-            }
-        ],
-        max_tokens=500,
+    messages = [{
+        "role": "user",
+        "content": [{"type": "text", "text": prompt}] + image_contents
+    }]
+    response = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=messages,
+        max_tokens=500
     )
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
@@ -48,13 +49,13 @@ if __name__ == "__main__":
 
     batch_size = 10
     batches = [image_files[i:i+batch_size] for i in range(0, len(image_files), batch_size)]
-    
+
     results = [None] * len(batches)
 
     # Run parallel batch analysis
     with ThreadPoolExecutor(max_workers=min(4, len(batches))) as executor:  # limit to a reasonable number of parallel requests
         future_to_index = {
-            executor.submit(analyze_images, batch, prompt): idx 
+            executor.submit(analyze_images, batch, prompt): idx
             for idx, batch in enumerate(batches)
         }
         for future in as_completed(future_to_index):

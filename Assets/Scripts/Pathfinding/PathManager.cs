@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -8,9 +7,10 @@ namespace Pathfinding {
         // References
         public GameObject Agent;
         private NavMeshAgent AgentNavMesh;
+        private StationNode AgentNode;
         
         // Nodes 
-        public StationNode StartNodeObj;
+        
         private Node StartNode;
         public StationNode[] Nodes, Exits;
         private readonly List<Node> ExitsList = new ();
@@ -20,17 +20,15 @@ namespace Pathfinding {
         private readonly AStar pathfinder = new AStar();
         private bool isPathfinding = false;
 
-        private void Awake() {
+        private void Start() {
             // Gather agent info
             AgentNavMesh = Agent.GetComponent<NavMeshAgent>();
-            StartNode = StartNodeObj.node;
+            AgentNode =  Agent.GetComponent<StationNode>();
+            StartNode = AgentNode.node;
             
             // Gather Information Regarding Nodes
             NodeCount = Nodes.Length;
-        }
-
-        private void Start()
-        {
+            
             // Create Node List
             foreach (var t in Exits) {
                 ExitsList.Add(t.node);

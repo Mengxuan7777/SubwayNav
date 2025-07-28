@@ -8,6 +8,10 @@ using UnityEngine.Rendering;
 
 namespace Camera {
     public class CameraManager : MonoBehaviour {
+        // References
+        [Header("References")]
+        public ImageAnalyzer imageAnalyzer;
+        
         // Camera References & Info
         [Header("Cameras")]
         public UnityEngine.Camera[] cameras;
@@ -68,6 +72,7 @@ namespace Camera {
             }
         }
         
+        // ReSharper disable Unity.PerformanceAnalysis
         /// <summary>
         /// Routinely take screenshots of all cameras in a folder.
         /// </summary>
@@ -87,6 +92,9 @@ namespace Camera {
                
                 // Delete old folder to make up space
                 DeleteOldFolders();
+                
+                // Analyze images
+                imageAnalyzer.AnalyzeImages(FolderPath, FileFormat);
                 
                 // Wait
                 yield return new WaitForSeconds(ScreenshotInterval);
@@ -133,7 +141,6 @@ namespace Camera {
                         ThreadPool.QueueUserWorkItem(_ => {
                             File.WriteAllBytes(fullPath, imageBytes);
                         });
-                        Destroy(tex);
                     }
                     gpuReadbacksInProgress--;
                 });
