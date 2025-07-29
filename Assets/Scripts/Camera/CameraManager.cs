@@ -11,7 +11,6 @@ namespace Camera {
         // References
         [Header("References")]
         public ImageAnalyzer imageAnalyzer;
-        public Pathfinding.PathManager pathfindingManager;
         
         // Camera References & Info
         [Header("Cameras")]
@@ -72,7 +71,7 @@ namespace Camera {
                 Directory.Delete(dir, true); 
             }
         }
-        
+
         // ReSharper disable Unity.PerformanceAnalysis
         /// <summary>
         /// Routinely take screenshots of all cameras in a folder.
@@ -81,26 +80,17 @@ namespace Camera {
         private IEnumerator ScreenshotRoutine() {
             // Continuously take screenshots until the play button is pressed
             while (true) {
-                // Create a new folder for the screenshots
                 FolderPath = Path.Combine(path, "Folder" + folderCount++);
-                if (!Directory.Exists(FolderPath)) {
-                    Directory.CreateDirectory(FolderPath);
-                }
-                
-                // Take screenshots
+                var createTask = CreateScreenshotFolderAsync(FolderPath);
+                while (!createTask.IsCompleted) yield return null;
+
                 yield return TakeScreenshots();
                 Debug.Log($"Finished taking screenshots of all {cameras.Length} cameras. Saved to: {FolderPath}");
-               
-                // Delete old folder to make up space
-                DeleteOldFolders();
-                
-                // Analyze images & update weight cost
-                yield return imageAnalyzer.AnalyzeImages(FolderPath, FileFormat).AsCoroutine();
-               
-                // Re-calculate path.
-                pathfindingManager.ReCalculatePath();
-                
-                // Wait
+
+                var deleteTask = DeleteOldFoldersAsync();
+                while (!deleteTask.IsCompleted) yield return null;
+
+                yield return imageAnalyzer.AnalyzeImagesAndRecalculatePath(FolderPath, FileFormat).AsCoroutine();
                 yield return new WaitForSeconds(ScreenshotInterval);
             }
             // ReSharper disable once IteratorNeverReturns
@@ -142,9 +132,7 @@ namespace Camera {
                         string fullPath = Path.Combine(FolderPath, fileName);
 
                         // Threaded file write
-                        ThreadPool.QueueUserWorkItem(_ => {
-                            File.WriteAllBytes(fullPath, imageBytes);
-                        });
+                        WriteImageFileAsync(fullPath, imageBytes);
                     }
                     gpuReadbacksInProgress--;
                 });
@@ -155,13 +143,35 @@ namespace Camera {
         }
         
         /// <summary>
-        /// Delete the oldest folder if there are more than 5 folders
+        /// Pushes folder creation to background thread, but notify the main thread on completion
         /// </summary>
-        private async void DeleteOldFolders() {
+        /// <param name="folderPath"></param>
+        private static async Task CreateScreenshotFolderAsync(string folderPath) {
+            await Task.Run(() => {
+                if (!Directory.Exists(folderPath)) {
+                    Directory.CreateDirectory(folderPath);
+                }
+            });
+        }
+        
+        /// <summary>
+        /// Pushes file writing to a background thread
+        /// </summary>
+        /// <param name="filePath">Path where image is to be written</param>
+        /// <param name="data">Image data</param>
+        private static void WriteImageFileAsync(string filePath, byte[] data) {
+            Task.Run(() => {
+                File.WriteAllBytes(filePath, data);
+            });
+        }
+        
+        /// <summary>
+        /// Push the deletion of older images to a background thread.
+        /// </summary>
+        private static async Task DeleteOldFoldersAsync() {
             try {
                 await Task.Run(() => {
                     string[] folders = Directory.GetDirectories(path);
-                    // Only keep the latest 5 folders
                     if (folders.Length > 5) {
                         Array.Sort(folders); // Sort by name (assumes Folder0, Folder1, ...)
                         for (int i = 0; i < folders.Length - 5; i++) {
@@ -170,9 +180,8 @@ namespace Camera {
                     }
                 });
             } catch (Exception e) {
-                //Debug.LogWarning("Error deleting old screenshot folders: " + e.Message);
+                Debug.LogWarning($"Error Deleting Folder: {e.Message}");
             }
-
         }
         
         /// <summary>
