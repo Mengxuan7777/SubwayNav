@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using Camera;
 using UnityEngine;
 using UnityEngine.AI;
+using Newtonsoft.Json;
 
 namespace Pathfinding {
     public class PathManager : MonoBehaviour {
@@ -10,15 +13,18 @@ namespace Pathfinding {
         private StationNode AgentNode;
         
         // Nodes 
-        
-        private Node StartNode;
         public StationNode[] Nodes, Exits;
+        private readonly Dictionary<string, Node> NodeLookup = new();
         private readonly List<Node> ExitsList = new ();
         private int NodeCount;
         
         // Pathfinding
+        private Node StartNode, OldNode, currentNode;
+        private List<Node> Path = new();
+        private int PathIndex = 0;
         private readonly AStar pathfinder = new AStar();
         private bool isPathfinding = false;
+        
 
         private void Start() {
             // Gather agent info
@@ -29,17 +35,22 @@ namespace Pathfinding {
             // Gather Information Regarding Nodes
             NodeCount = Nodes.Length;
             
-            // Create Node List
+            // Create Node List/Dictionary
             foreach (var t in Exits) {
                 ExitsList.Add(t.node);
             }
+            foreach (var node in Nodes) {
+                NodeLookup.Add(node.name, node.node);
+            }
         }
 
-        private void Update()
-        {
-            if (Input.GetKeyDown((KeyCode.A)) && !isPathfinding) {
-                ReCalculatePath();
-                isPathfinding = true;
+        private void Update() {
+            // Set agent to the next destination
+            if (Path.Count != 0 && AgentNavMesh.remainingDistance <= AgentNavMesh.stoppingDistance) {
+                currentNode = Path[PathIndex];
+                if (PathIndex >0) OldNode = Path[PathIndex - 1];
+                AgentNavMesh.SetDestination(currentNode.Position);
+                PathIndex++;
             }
         }
 
@@ -47,11 +58,30 @@ namespace Pathfinding {
         /// <summary>
         /// Recalculates the path based on the new edge weights.
         /// </summary>
-        private void ReCalculatePath() { 
-            List<Node> path = pathfinder.FindPath(NodeCount, StartNode, ExitsList);
-            foreach (var node in path)
-            {
-                Debug.Log($"[{node.Position.x}, {node.Position.y}, {node.Position.z}]");
+        public void ReCalculatePath() {
+            // If agent is on a path, determine the nearest node. 
+            if (AgentNavMesh.hasPath) {
+                var d1 = Vector3.Distance(Agent.transform.position, OldNode.Position);
+                var d2 = Vector3.Distance(Agent.transform.position, AgentNavMesh.destination);
+                StartNode = d2 <= d1 ? currentNode : OldNode;
+            }
+            // Update agent path
+            Path = new List<Node>(); // Set path temporarily to nothing
+            PathIndex = 0;
+            Path = pathfinder.FindPath(NodeCount, StartNode, ExitsList);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="updates"></param>
+        public void UpdateEdgeWeights(string updates) {
+            // Parse json file
+            GPTMessage[] message = JsonConvert.DeserializeObject<GPTMessage[]>(updates);
+            // Update cost for each node.
+            foreach (var update in message) {
+                var node = NodeLookup[update.name];
+                UpdateEdgeWeight(node, update.crowdCost, update.fireCost);
             }
         }
         

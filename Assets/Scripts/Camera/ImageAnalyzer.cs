@@ -5,28 +5,26 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
-using System.Text;
 
 namespace Camera {
     public class ImageAnalyzer: MonoBehaviour {
         // References
         public CameraManager cameraManager;
         public Pathfinding.PathManager pathfindingManager;
-        
+
         // Prompt
-        private readonly string prompt = "Analyze the following images and provide a reasoning for the results.";
+        private readonly string prompt = "Analyze the following images and provide a reasoning for the results.1. For each image, return an object with fields: name (string), crowdCost (integer), fireCost (integer). 'name' the image filename without the file format. crowdCost represents the crowdness on a scale of 0-10. fireCost represents the fire danger on a scale of 0-10. Output a JSON array of these objects, and nothing else.";
 
         // Path to your Python interpreter and script
-        // Configure these paths according to your local Python installation
         private readonly string pythonExePath = @"C:\Users\tower\AppData\Local\Microsoft\WindowsApps\python.exe"; // Change this to your python.exe
         private readonly string pythonScriptPath = Path.Combine(Application.dataPath, "Scripts/Camera/", "analyze_images.py"); // adjust subfolder as needed
-        
+
         /// <summary>
         /// Calls python function to analyze the images using the OpenAI AI
         /// </summary>
         /// <param name="path">Folder where images are stored</param>
         /// <param name="extension">File format of images</param>
-        public async void AnalyzeImages(string path, string extension = "jpg") {
+        public async Task AnalyzeImages(string path, string extension = "jpg") {
             try {
                 // Make sure folder is not empty
                 var imagesPaths = GetImagesPaths(path, extension);
@@ -36,25 +34,20 @@ namespace Camera {
                 }
 
                 // Call Python script asynchronously
-                string analysisResult = await RunPythonScript(path, prompt);
-
-                Debug.Log($"[Python Result]: {analysisResult}");
-                // Optionally: Handle parsing the JSON result here
-
+                // It also updated the edge costs
+                await RunPythonScript(path, prompt);
             } catch (Exception e) {
-                Debug.Log($"[Python]: {e.Message}");
+                Debug.LogError($"[Python]: An error occurred while analyzing images: {e.Message}");;
             }
         }
 
         /// <summary>
-        /// Calls python function to analyze images
+        /// Calls python function to analyze images and updated edge weights
         /// </summary>
         /// <param name="imageFolder">Folder where images are stored</param>
         /// <param name="promptText">Prompt to give to ChatGPT</param>
         /// <returns></returns>
-        private async Task<string> RunPythonScript(string imageFolder, string promptText) {
-            var output = new StringBuilder();
-            var error = new StringBuilder();
+        private async Task RunPythonScript(string imageFolder, string promptText) {
             var start = new ProcessStartInfo {
                 FileName = pythonExePath,
                 Arguments = $"\"{pythonScriptPath}\" \"{imageFolder}\" \"{promptText.Replace("\"", "\\\"")}\"",
@@ -64,17 +57,20 @@ namespace Camera {
                 CreateNoWindow = true
             };
             using var process = new Process { StartInfo = start };
-            process.OutputDataReceived += (sender, args) => { if (args.Data != null) output.AppendLine(args.Data); };
-            process.ErrorDataReceived += (sender, args) => { if (args.Data != null) error.AppendLine(args.Data); };
             process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-            await Task.Run(() => process.WaitForExit());
-            if (error.Length > 0)
-                throw new Exception($"Python error: {error}");
-            return output.ToString().Trim();
+
+            // Stream output line by line as batches finish
+            while (!process.StandardOutput.EndOfStream) {
+                var line = await process.StandardOutput.ReadLineAsync();
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    Debug.Log($"[Python Result (batch)]: {line}");
+                    pathfindingManager.UpdateEdgeWeights(line);
+                }
+            }
+            process.WaitForExit();
         }
-        
+
         /// <summary>
         /// Gathers the directories of all the images in the given folder.
         /// </summary>

@@ -11,6 +11,7 @@ namespace Camera {
         // References
         [Header("References")]
         public ImageAnalyzer imageAnalyzer;
+        public Pathfinding.PathManager pathfindingManager;
         
         // Camera References & Info
         [Header("Cameras")]
@@ -93,8 +94,11 @@ namespace Camera {
                 // Delete old folder to make up space
                 DeleteOldFolders();
                 
-                // Analyze images
-                imageAnalyzer.AnalyzeImages(FolderPath, FileFormat);
+                // Analyze images & update weight cost
+                yield return imageAnalyzer.AnalyzeImages(FolderPath, FileFormat).AsCoroutine();
+               
+                // Re-calculate path.
+                pathfindingManager.ReCalculatePath();
                 
                 // Wait
                 yield return new WaitForSeconds(ScreenshotInterval);

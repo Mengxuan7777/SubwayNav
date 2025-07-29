@@ -36447,6 +36447,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   imageAnalyzer: {fileID: 1337311100}
+  pathfindingManager: {fileID: 887436460}
   cameras:
   - {fileID: 1625333321}
   - {fileID: 1570775616}
@@ -36503,8 +36504,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraManager: {fileID: 1337311099}
   pathfindingManager: {fileID: 887436460}
-  pythonExePath: C:\Path\To\python.exe
-  pythonScriptPath: C:\Path\To\analyze_images.py
 --- !u!1 &1337417323
 GameObject:
   m_ObjectHideFlags: 0
