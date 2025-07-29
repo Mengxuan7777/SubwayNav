@@ -45,10 +45,12 @@ namespace Pathfinding {
         }
 
         private void Update() {
+            // If path is empty, don't bother to check
+            if (Path.Count == 0) return;
             // Set agent to the next destination
-            if (Path.Count != 0 && AgentNavMesh.remainingDistance <= AgentNavMesh.stoppingDistance) {
-                currentNode = Path[PathIndex];
-                if (PathIndex >0) OldNode = Path[PathIndex - 1];
+            if (AgentNavMesh.remainingDistance <= AgentNavMesh.stoppingDistance && PathIndex < Path.Count) {
+                 currentNode = Path[PathIndex];
+                if (PathIndex > 0) OldNode = Path[PathIndex - 1];
                 AgentNavMesh.SetDestination(currentNode.Position);
                 PathIndex++;
             }
@@ -76,6 +78,9 @@ namespace Pathfinding {
         /// </summary>
         /// <param name="updates"></param>
         public void UpdateEdgeWeights(string updates) {
+            //Make sure string is not empty
+            if (string.IsNullOrEmpty(updates)) { return; }
+            
             // Parse json file
             GPTMessage[] message = JsonConvert.DeserializeObject<GPTMessage[]>(updates);
             // Update cost for each node.
@@ -90,9 +95,9 @@ namespace Pathfinding {
         /// Yes, this runs in O(N^2) time. However, in the worst-case scenario N=6,
         /// which means this basically runs in basically O(1).
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="crowdCost"></param>
-        /// <param name="fireCost"></param>
+        /// <param name="node">Node to update costs</param>
+        /// <param name="crowdCost">Level of crowdedness </param>
+        /// <param name="fireCost">Hazard level of fire</param>
         private void UpdateEdgeWeight(Node node, float crowdCost, float fireCost) {
             foreach (var edge in node.Edges) {
                 // Update the outgoing edge weight

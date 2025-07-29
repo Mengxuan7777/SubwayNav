@@ -3,6 +3,7 @@ import base64
 import os
 import sys
 import json
+import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Get the API key & set client
@@ -34,13 +35,13 @@ def analyze_images(image_paths, prompt):
         response = client.chat.completions.create(
             model="gpt-4.1-mini",
             messages=messages,
-            response_format={"type": "json_object"},  # <- enforce JSON output
+            response_format={"type":"text"},
             max_tokens=500
         )
         # Parse the response content as JSON array or dict
         content = response.choices[0].message.content
         try:
-            result = json.loads(content)
+            result = extract_json_array(content)
         except Exception as exc:
             print("ERROR parsing response as JSON:", exc, file=sys.stderr)
             result = None  # fallback to None for clarity
@@ -48,6 +49,33 @@ def analyze_images(image_paths, prompt):
     except Exception as exc:
         print("ERROR during OpenAI API call:", exc, file=sys.stderr)
         return None
+
+def extract_json_array(text):
+    # Try to extract JSON inside ```json ... ```
+    match = re.search(r"```(?:json)?\s*([\s\S]*?)```", text)
+    if match:
+        candidate = match.group(1).strip()
+        try:
+            return json.loads(candidate)
+        except Exception:
+            pass  # fallback if parsing fails
+
+    # Fallback: try to extract first JSON array (handles if no code block)
+    match = re.search(r"(\[\s*{[\s\S]*?}\s*])", text)
+    if match:
+        candidate = match.group(1)
+        try:
+            return json.loads(candidate)
+        except Exception:
+            pass
+
+    # Try loading whole string as JSON as a last attempt
+    try:
+        return json.loads(text.strip())
+    except Exception:
+        pass
+
+    raise ValueError("Could not extract JSON array from the model output.")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

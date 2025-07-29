@@ -24,18 +24,22 @@ namespace Camera {
         /// </summary>
         /// <param name="path">Folder where images are stored</param>
         /// <param name="extension">File format of images</param>
-        public async Task AnalyzeImages(string path, string extension = "jpg") {
-            try {
-                // Make sure folder is not empty
-                var imagesPaths = GetImagesPaths(path, extension);
-                if (imagesPaths.Count == 0) {
-                    Debug.LogWarning("[Python]: No images for analysis.");
-                    return;
-                }
+        public async Task AnalyzeImagesAndRecalculatePath(string path, string extension = "jpg") {
+            // Make sure folder is not empty
+            var imagesPaths = GetImagesPaths(path, extension);
+            if (imagesPaths.Count == 0) {
+                Debug.LogWarning("[Python]: No images for analysis.");
+                return;
+            }
 
-                // Call Python script asynchronously
-                // It also updated the edge costs
-                await RunPythonScript(path, prompt);
+            // Call Python script asynchronously
+            // It also updated the edge costs
+            await RunPythonScript(path, prompt);
+            
+            // Re-calculate the path using A*
+            pathfindingManager.ReCalculatePath();
+            try {
+                
             } catch (Exception e) {
                 Debug.LogError($"[Python]: An error occurred while analyzing images: {e.Message}");;
             }
@@ -59,11 +63,21 @@ namespace Camera {
             using var process = new Process { StartInfo = start };
             process.Start();
 
+            // Read errors in the background
+            _ = Task.Run(async () => {
+                while (!process.StandardError.EndOfStream) {
+                    var errLine = await process.StandardError.ReadLineAsync();
+                    if (!string.IsNullOrWhiteSpace(errLine))
+                    {
+                        Debug.LogError($"[Python Error]: {errLine}");
+                    }
+                }
+            });
+            
             // Stream output line by line as batches finish
             while (!process.StandardOutput.EndOfStream) {
                 var line = await process.StandardOutput.ReadLineAsync();
-                if (!string.IsNullOrWhiteSpace(line))
-                {
+                if (!string.IsNullOrWhiteSpace(line)) {
                     Debug.Log($"[Python Result (batch)]: {line}");
                     pathfindingManager.UpdateEdgeWeights(line);
                 }
@@ -86,7 +100,7 @@ namespace Camera {
                     images.Add(file);
                 }
                 Debug.Log($"Found {images.Count} images in {path}");
-            }catch (Exception e) {
+            } catch (Exception e) {
                 Debug.LogWarning($"An error occurred while searching for images: {e.Message}");
             }
 

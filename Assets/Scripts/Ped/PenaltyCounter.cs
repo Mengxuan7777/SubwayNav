@@ -5,12 +5,12 @@ using UnityEngine;
 public class PenaltyCounter : MonoBehaviour {
     // Start is called before the first frame update
     [Header("Penalty Counters")] 
-    public int collisionWithFire;
-    public int collisionWithPedestrian;
-    
-    [Header("Log Settings")]
-    public string LogPath = "Users/tower/Documents/Unity Projects/SubwayNav/Assets/Logs/" ;
-    private StreamWriter writer;
+    private static int collisionWithFire;
+    private static int collisionWithPedestrian;
+
+    [Header("Log Settings")] 
+    private const string LogPath = "Users/tower/Documents/Unity Projects/SubwayNav/Assets/Logs/";
+    private static StreamWriter writer;
 
     private void Start() {
         // Create a new file name
@@ -29,7 +29,7 @@ public class PenaltyCounter : MonoBehaviour {
         writer.WriteLineAsync("Collision with Fire, Collision with Pedestrian" + Environment.NewLine);
     }
 
-    private void OnApplicationQuit() {
+    private void OnDisable() {
         // Log data
         writer.WriteLine($"{collisionWithFire}, {collisionWithPedestrian}");
         writer.Close();

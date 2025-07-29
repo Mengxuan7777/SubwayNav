@@ -637,9 +637,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ac11be6d4ed9cf4cb38afbc171c8bad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionWithFire: 0
-  collisionWithPedestrian: 0
-  LogPath: C:/Users/tower/Documents/Unity Projects/SubwayNav/Assets/Logs/
 --- !u!1 &30574960
 GameObject:
   m_ObjectHideFlags: 0
@@ -36447,7 +36444,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   imageAnalyzer: {fileID: 1337311100}
-  pathfindingManager: {fileID: 887436460}
   cameras:
   - {fileID: 1625333321}
   - {fileID: 1570775616}
@@ -56171,7 +56167,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2123269206
 MonoBehaviour:
   m_ObjectHideFlags: 0
