@@ -571,7 +571,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 1
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -1421,9 +1421,9 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.033333335
+  m_VoxelSize: 0.1
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: ad3eaaa1d04e13c4494789f6b0c6e6f7, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 6c3d40257577cfa4bbabdf008bd06e26, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &54411613
 Transform:
@@ -16673,19 +16673,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1336852577769287842, guid: 84c7b6fff50144b4cba7e8031ec029c7, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 16
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3519266463273440918, guid: 84c7b6fff50144b4cba7e8031ec029c7, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 16
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5048391753944773657, guid: 84c7b6fff50144b4cba7e8031ec029c7, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 16
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6662509448164295093, guid: 84c7b6fff50144b4cba7e8031ec029c7, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 16
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8750559767118168727, guid: 84c7b6fff50144b4cba7e8031ec029c7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -39705,7 +39705,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.5
   far clip plane: 250
   field of view: 50
   orthographic: 0
@@ -44959,7 +44959,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5000001
   m_Height: 1

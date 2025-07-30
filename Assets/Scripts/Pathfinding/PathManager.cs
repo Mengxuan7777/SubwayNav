@@ -46,7 +46,7 @@ namespace Pathfinding {
             // If path is empty, don't bother to check
             if (Path.Count == 0) return;
             // Set agent to the next destination
-            if (AgentNavMesh.remainingDistance <= AgentNavMesh.stoppingDistance && PathIndex < Path.Count) {
+            if (AgentNavMesh.remainingDistance <= AgentNavMesh.stoppingDistance + 1 && PathIndex < Path.Count) {
                  currentNode = Path[PathIndex];
                 if (PathIndex > 0) OldNode = Path[PathIndex - 1];
                 AgentNavMesh.SetDestination(currentNode.Position);
