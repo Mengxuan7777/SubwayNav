@@ -36,7 +36,7 @@ namespace Camera {
         public string FolderPath;
         private int folderCount;
         private int gpuReadbacksInProgress = 0;
-        private const int MaxConcurrentReadbacks = 2;
+        private const int MaxConcurrentReadbacks = 16;
 
         
         private void Awake() {
@@ -51,8 +51,8 @@ namespace Camera {
             SetResolution();
             InitializeTextures();
         }
-        
-        void Start() {
+
+        private void Start() {
             // Set textures to cameras
             for (int i = 0; i < cameras.Length; i++) {
                 cameras[i].targetTexture = cameraRenderTextures[i];
@@ -84,13 +84,19 @@ namespace Camera {
                 var createTask = CreateScreenshotFolderAsync(FolderPath);
                 while (!createTask.IsCompleted) yield return null;
 
+                // Take all screenshots
                 yield return TakeScreenshots();
                 Debug.Log($"Finished taking screenshots of all {cameras.Length} cameras. Saved to: {FolderPath}");
-
+                
+                // Delete older images
                 var deleteTask = DeleteOldFoldersAsync();
                 while (!deleteTask.IsCompleted) yield return null;
+                
+                // Analyze and Re-calculate the path
+                yield return StartCoroutine(
+                    imageAnalyzer.AnalyzeImagesAndRecalculatePathCoroutine(FolderPath, FileFormat)
+                );
 
-                yield return imageAnalyzer.AnalyzeImagesAndRecalculatePath(FolderPath, FileFormat).AsCoroutine();
                 yield return new WaitForSeconds(ScreenshotInterval);
             }
             // ReSharper disable once IteratorNeverReturns
