@@ -77,7 +77,7 @@ namespace Camera {
         /// Routinely take screenshots of all cameras in a folder.
         /// </summary>
         /// <returns></returns>
-        private IEnumerator ScreenshotRoutine() {
+        public IEnumerator ScreenshotRoutine() {
             // Continuously take screenshots until the play button is pressed
             while (true) {
                 FolderPath = Path.Combine(path, "Folder" + folderCount++);

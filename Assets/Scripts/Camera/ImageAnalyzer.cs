@@ -82,34 +82,30 @@ namespace Camera {
                     RedirectStandardError = true,
                     CreateNoWindow = true
                 };
-                using var process = new Process { StartInfo = start };
+                using var process = new Process();
+                process.StartInfo = start;
                 process.Start();
 
                 // Read errors in the background
-                _ = Task.Run(async () =>
-                {
-                    while (!process.StandardError.EndOfStream)
-                    {
+                _ = Task.Run(async () => {
+                    while (!process.StandardError.EndOfStream) {
                         var errLine = await process.StandardError.ReadLineAsync();
                         if (!string.IsNullOrWhiteSpace(errLine)) Debug.LogError($"[Python Error]: {errLine}");
                     }
                 });
 
                 // Stream output line by line as batches finish
-                while (!process.StandardOutput.EndOfStream)
-                {
+                while (!process.StandardOutput.EndOfStream) {
                     var line = process.StandardOutput.ReadLine();
-                    if (!string.IsNullOrWhiteSpace(line))
-                    {
+                    if (!string.IsNullOrWhiteSpace(line)) {
                         // This line updates Unity objects: needs to be back on main thread
                         MainThreadDispatcher.Enqueue(() => pathfindingManager.UpdateEdgeWeights(line));
                         Debug.Log($"[Python Result (batch)]: {line}");
                     }
                 }
-
                 process.WaitForExit();
-    });
-}
+            });
+        }
 
         /// <summary>
         /// Gathers the directories of all the images in the given folder.
@@ -122,10 +118,7 @@ namespace Camera {
 
             var images = new List<string>();
             try {
-                foreach (var file in Directory.GetFiles(path, $"*.{extension}")) {
-                    images.Add(file);
-                }
-                Debug.Log($"Found {images.Count} images in {path}");
+                images.AddRange(Directory.GetFiles(path, $"*.{extension}"));
             } catch (Exception e) {
                 Debug.LogWarning($"An error occurred while searching for images: {e.Message}");
             }
