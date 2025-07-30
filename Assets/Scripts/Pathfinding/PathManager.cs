@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Camera;
 using UnityEngine;
@@ -23,7 +22,6 @@ namespace Pathfinding {
         private List<Node> Path = new();
         private int PathIndex = 0;
         private readonly AStar pathfinder = new AStar();
-        private bool isPathfinding = false;
         
 
         private void Start() {

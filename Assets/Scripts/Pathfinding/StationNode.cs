@@ -3,10 +3,10 @@ using UnityEngine;
 namespace Pathfinding {
     public class StationNode : MonoBehaviour {
         // References
-        public StationNode[] NeighbourNodes;
+        [SerializeField]  public StationNode[] NeighbourNodes;
         
         // Node Information
-        [HideInInspector] internal Node node;
+        internal Node node;
 
         private void Awake() {
             // Initialize node

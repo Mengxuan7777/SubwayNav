@@ -95,9 +95,9 @@ namespace Pathfinding {
     /// </summary>
     public class Node : FastPriorityQueueNode {
         // Parameters
-        public new string name;
+        public string name;
         public Vector3 Position;
-        public List<Edge> Edges = new List<Edge>();
+        public readonly List<Edge> Edges = new List<Edge>();
         
         // Constructor
         public Node(string name, Vector3 position) {

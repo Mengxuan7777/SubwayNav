@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -10,11 +9,11 @@ namespace Camera {
     public class CameraManager : MonoBehaviour {
         // References
         [Header("References")]
-        public ImageAnalyzer imageAnalyzer;
+        [SerializeField] public ImageAnalyzer imageAnalyzer;
         
         // Camera References & Info
         [Header("Cameras")]
-        public UnityEngine.Camera[] cameras;
+        [SerializeField] public UnityEngine.Camera[] cameras;
         private RenderTexture[] cameraRenderTextures;
         private Texture2D[] cameraTextures;
         private readonly object fileLock = new ();
@@ -22,18 +21,18 @@ namespace Camera {
         // Settings
         [Header("Screenshot Settings")]
         [Tooltip("Take screenshots automatically when the play button is pressed")] 
-        public bool AutomaticScreenshot = true;
+        [SerializeField] public bool AutomaticScreenshot = true;
         [Tooltip("Interval between screenshots in seconds.")] 
-        public float ScreenshotInterval = 30f;
+        [SerializeField] public float ScreenshotInterval = 30f;
         [Tooltip("Options: 1080p, 720p, 480p. Defaults to 720p.")] 
-        public string Resolution = "720p";
+        [SerializeField] public string Resolution = "720p";
         private int width, height;
         [Tooltip("Options: png or jpg. Defaults to jpg.")] 
-        public string FileFormat = "jpg";
+        [SerializeField] public string FileFormat = "jpg";
         
         // Storage of Images
         private static string path;
-        public string FolderPath;
+        [SerializeField] public string FolderPath;
         private int folderCount;
         private int gpuReadbacksInProgress = 0;
         private const int MaxConcurrentReadbacks = 16;

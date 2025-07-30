@@ -10,16 +10,24 @@ using Debug = UnityEngine.Debug;
 namespace Camera {
     public class ImageAnalyzer: MonoBehaviour {
         // References
-        public CameraManager cameraManager;
-        public Pathfinding.PathManager pathfindingManager;
+        [SerializeField]  public CameraManager cameraManager;
+        [SerializeField]  public Pathfinding.PathManager pathfindingManager;
 
-        // Prompt
-        private readonly string prompt = "Analyze the following images and provide a reasoning for the results.1. For each image, return an object with fields: name (string), crowdCost (integer), fireCost (integer). 'name' the image filename without the file format. crowdCost represents the crowdness on a scale of 0-10. fireCost represents the fire danger on a scale of 0-10. Output a JSON array of these objects, and nothing else.";
+        // Prompts
+        private const string trainingsPrompt = "You will be provided with example images, each illustrating a specific level of crowdedness and fire danger in a subway station."
+                                               + "Use these example images as a guide to evaluate and assign crowdedness and fire danger levels to new images. "
+                                               + "Your assessment should be based on visual similarities to the examples.";
+
+        private const string analysisPrompt = "Analyze the images provided. For each image, return a JSON object with the following fields:" 
+                                      + "name : Filename without extension (string)" 
+                                      + "crowdCost: crowdedness level (integer, 0–10)" 
+                                      + "fireCost: Fire danger level (integer, 0–10)" 
+                                      + "Output a JSON array of these objects. Do not include any additional text, explanations, or reasoning.";
 
         // Path to your Python interpreter and script
-        private readonly string pythonExePath = @"C:\Users\tower\AppData\Local\Microsoft\WindowsApps\python.exe"; // Change this to your python.exe
-        private readonly string pythonScriptPath = Path.Combine(Application.dataPath, "Scripts/Camera/", "analyze_images.py"); // adjust subfolder as needed
-
+        private readonly string pythonExePath = @"C:\Users\tower\AppData\Local\Microsoft\WindowsApps\python.exe"; 
+        private readonly string pythonScriptPath = Path.Combine(Application.dataPath, "Scripts/Camera/", "analyze_images.py");
+        
         // ReSharper disable Unity.PerformanceAnalysis
         /// <summary>
         /// Pushes analysis of images and calculation of path to a background thread
@@ -55,7 +63,7 @@ namespace Camera {
 
             // Call Python script asynchronously
             // It also updated the edge costs
-            await RunPythonScript(path, prompt);
+            await RunPythonScript(path, analysisPrompt);
             
             // Re-calculate the path using A*
             pathfindingManager.ReCalculatePath();
