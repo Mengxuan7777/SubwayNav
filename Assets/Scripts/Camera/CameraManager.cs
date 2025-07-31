@@ -129,7 +129,7 @@ namespace Camera {
                         
                         // Determine encoding
                         byte[] imageBytes = (FileFormat.ToLower() == "jpg")
-                            ? tex.EncodeToJPG()
+                            ? tex.EncodeToJPG(80)
                             : tex.EncodeToPNG();
                         
                         // Create filepath

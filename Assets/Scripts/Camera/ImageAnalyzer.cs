@@ -13,20 +13,12 @@ namespace Camera {
         [SerializeField]  public CameraManager cameraManager;
         [SerializeField]  public Pathfinding.PathManager pathfindingManager;
 
-        // Prompts
-        private const string trainingsPrompt = "You will be provided with example images, each illustrating a specific level of crowdedness and fire danger in a subway station."
-                                               + "Use these example images as a guide to evaluate and assign crowdedness and fire danger levels to new images. "
-                                               + "Your assessment should be based on visual similarities to the examples.";
-
-        private const string analysisPrompt = "Analyze the images provided. For each image, return a JSON object with the following fields:" 
-                                      + "name : Filename without extension (string)" 
-                                      + "crowdCost: crowdedness level (integer, 0–10)" 
-                                      + "fireCost: Fire danger level (integer, 0–10)" 
-                                      + "Output a JSON array of these objects. Do not include any additional text, explanations, or reasoning.";
-
         // Path to your Python interpreter and script
         private readonly string pythonExePath = @"C:\Users\tower\AppData\Local\Microsoft\WindowsApps\python.exe"; 
         private readonly string pythonScriptPath = Path.Combine(Application.dataPath, "Scripts/Camera/", "analyze_images.py");
+        
+        // Reference Image folder
+        private static readonly string referenceImageFolder = Application.streamingAssetsPath + "/VLM_Training";
         
         // ReSharper disable Unity.PerformanceAnalysis
         /// <summary>
@@ -63,7 +55,7 @@ namespace Camera {
 
             // Call Python script asynchronously
             // It also updated the edge costs
-            await RunPythonScript(path, analysisPrompt);
+            await RunPythonScript(path, referenceImageFolder);
             
             // Re-calculate the path using A*
             pathfindingManager.ReCalculatePath();
@@ -78,13 +70,13 @@ namespace Camera {
         /// Calls python function to analyze images and updated edge weights
         /// </summary>
         /// <param name="imageFolder">Folder where images are stored</param>
-        /// <param name="promptText">Prompt to give to ChatGPT</param>
+        /// <param name="referenceFolder"></param>
         /// <returns></returns>
-        private async Task RunPythonScript(string imageFolder, string promptText) {
+        private async Task RunPythonScript(string imageFolder, string referenceFolder) {
             await Task.Run(() => {
                 var start = new ProcessStartInfo {
                     FileName = pythonExePath,
-                    Arguments = $"\"{pythonScriptPath}\" \"{imageFolder}\" \"{promptText.Replace("\"", "\\\"")}\"",
+                    Arguments = $"\"{pythonScriptPath}\" \"{imageFolder}\" \"{referenceFolder}\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
