@@ -23,6 +23,10 @@ namespace Pathfinding {
         private int PathIndex = 0;
         private readonly AStar pathfinder = new AStar();
         
+        // Constants
+        private const int crowdPenaltyMultiplier = 5,
+            firePenaltyMultiplier = 5000;
+        
         private void Start() {
             // Gather agent info
             AgentNavMesh = Agent.GetComponent<NavMeshAgent>();
@@ -58,6 +62,7 @@ namespace Pathfinding {
         /// Recalculates the path based on the new edge weights.
         /// </summary>
         public void ReCalculatePath() {
+            Debug.Log("Recalculating Path");
             // If agent is on a path, determine the nearest node. 
             if (AgentNavMesh.hasPath) {
                 var d1 = Vector3.Distance(Agent.transform.position, OldNode.Position);
@@ -75,7 +80,6 @@ namespace Pathfinding {
         /// </summary>
         /// <param name="updates"></param>
         public void UpdateEdgeWeights(string updates) {
-            Debug.Log($"[Python]: Updating Edge Weights");
             //Make sure string is not empty
             if (string.IsNullOrEmpty(updates)) { return; }
             
@@ -85,7 +89,9 @@ namespace Pathfinding {
             foreach (var update in message) {
                 // Make sure node exists, and then update
                 if (NodeLookup.TryGetValue(update.name, out var node)) {
-                    UpdateEdgeWeight(node, update.crowdCost, update.fireCost);
+                    UpdateEdgeWeight(node, 
+                        update.crowdCost * crowdPenaltyMultiplier,
+                        update.fireCost * firePenaltyMultiplier);
                 } else {
                     Debug.LogWarning($"[UpdateEdgeWeights] Node '{update.name}' not found in NodeLookup. Skipping.");
                 }
@@ -101,15 +107,15 @@ namespace Pathfinding {
         /// <param name="crowdCost">Level of crowdedness </param>
         /// <param name="fireCost">Hazard level of fire</param>
         private void UpdateEdgeWeight(Node node, float crowdCost, float fireCost) {
+            // Update the danger level of the node
+            node.DangerLevel = crowdCost + fireCost;
+            Debug.Log($"[{node.Name}] Danger Level: {node.DangerLevel}");
+            
+            // Update incoming edges
             foreach (var edge in node.Edges) {
-                // Update the outgoing edge weight
-                Debug.Log($"{node.name} -> {edge.TargetNode.name}: {edge.DistanceCost} ");
-                edge.Weight = edge.DistanceCost + crowdCost + fireCost;
-                
-                // Update the incoming edge weight
-                foreach (var NBREdge in edge.TargetNode.Edges) {
-                    if (NBREdge.TargetNode == node) {
-                        NBREdge.Weight = edge.Weight;
+                foreach (var inEdge in edge.TargetNode.Edges) {
+                    if (inEdge.TargetNode == node) {
+                        inEdge.Weight = inEdge.DistanceCost + node.DangerLevel;
                     }
                 }
             }

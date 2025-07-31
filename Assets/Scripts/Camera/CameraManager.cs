@@ -77,6 +77,9 @@ namespace Camera {
         /// </summary>
         /// <returns></returns>
         public IEnumerator ScreenshotRoutine() {
+            // Add small delay
+            yield return new WaitForSeconds(1f);
+            
             // Continuously take screenshots until the play button is pressed
             while (true) {
                 FolderPath = Path.Combine(path, "Folder" + folderCount++);

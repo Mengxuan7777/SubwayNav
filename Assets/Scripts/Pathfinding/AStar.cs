@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Priority_Queue;
 
@@ -96,24 +95,24 @@ namespace Pathfinding {
     /// </summary>
     public class Node : FastPriorityQueueNode {
         // Parameters
-        public string name;
+        public string Name { get; }
         public Vector3 Position;
+        public float DangerLevel = 0;
         public readonly List<Edge> Edges = new List<Edge>();
         
         // Constructor
         public Node(string name, Vector3 position) {
-            this.name = name;
+            Name = name;
             Position = position;
         }
     }
-    
     
     /// <summary>
     /// Edge utility class 
     /// </summary>
     public class Edge {
         // Parameters
-        public Node TargetNode;
+        public readonly Node TargetNode;
         public float Weight;
         public readonly float DistanceCost;
 
