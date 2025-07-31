@@ -1415,13 +1415,13 @@ MonoBehaviour:
     m_Bits: 4294967295
   m_UseGeometry: 0
   m_DefaultArea: 0
-  m_GenerateLinks: 0
+  m_GenerateLinks: 1
   m_IgnoreNavMeshAgent: 1
   m_IgnoreNavMeshObstacle: 1
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.1
+  m_VoxelSize: 0.033333335
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 6c3d40257577cfa4bbabdf008bd06e26, type: 2}
   m_BuildHeightMesh: 0
@@ -39636,7 +39636,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.5
+  near clip plane: 0.01
   far clip plane: 250
   field of view: 50
   orthographic: 0
@@ -39648,7 +39648,7 @@ Camera:
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
-  m_TargetEye: 3
+  m_TargetEye: 0
   m_HDR: 1
   m_AllowMSAA: 1
   m_AllowDynamicResolution: 0
@@ -132165,6 +132165,7 @@ GameObject:
   - component: {fileID: 2539274446265092402}
   - component: {fileID: 6400178991711928270}
   - component: {fileID: 2798779181474784794}
+  - component: {fileID: 6400178991711928271}
   m_Layer: 0
   m_Name: Object_42
   m_TagString: Untagged
@@ -386128,6 +386129,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1484286769915046288}
   m_Mesh: {fileID: -5969325811282167558, guid: 045f8de9a3e78c14eb52f53fb166a92c, type: 3}
+--- !u!114 &6400178991711928271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484286769915046288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35e95dc5ff2b64380880dd7ac5922847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Size: {x: 4, y: 3, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
+  m_Area: 0
+  m_AffectedAgents: ffffffff
 --- !u!33 &6400356765651908225
 MeshFilter:
   m_ObjectHideFlags: 0
