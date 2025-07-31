@@ -55567,7 +55567,7 @@ Transform:
   m_GameObject: {fileID: 2107114222}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.37, y: -0.08, z: -12.13}
+  m_LocalPosition: {x: 1.92, y: -0.08, z: -11.67}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -56628,7 +56628,7 @@ MonoBehaviour:
   - {fileID: 1670228159}
   - {fileID: 560446340}
   - {fileID: 1597944057}
-  npcsPerSpawnPoint: 5
+  npcsPerSpawnPoint: 0
   spawnInterval: 2
 --- !u!114 &2144469415
 MonoBehaviour:
