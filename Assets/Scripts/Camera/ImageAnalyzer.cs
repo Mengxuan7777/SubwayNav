@@ -100,7 +100,7 @@ namespace Camera {
                     if (!string.IsNullOrWhiteSpace(line)) {
                         // This line updates Unity objects: needs to be back on main thread
                         MainThreadDispatcher.Enqueue(() => pathfindingManager.UpdateEdgeWeights(line));
-                        Debug.Log($"[Python Result (batch)]: {line}");
+                        //Debug.Log($"[Python Result (batch)]: {line}");
                     }
                 }
                 process.WaitForExit();

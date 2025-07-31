@@ -25212,6 +25212,7 @@ GameObject:
   m_Component:
   - component: {fileID: 887436459}
   - component: {fileID: 887436460}
+  - component: {fileID: 887436461}
   m_Layer: 0
   m_Name: Station Nodes
   m_TagString: Untagged
@@ -25325,6 +25326,18 @@ MonoBehaviour:
   - {fileID: 1170969408}
   - {fileID: 1336534770}
   - {fileID: 853628524}
+--- !u!114 &887436461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887436458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d08e7ff21d8745afb4b726e6b0a47452, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &889843206
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,7 +23,6 @@ namespace Pathfinding {
         private int PathIndex = 0;
         private readonly AStar pathfinder = new AStar();
         
-
         private void Start() {
             // Gather agent info
             AgentNavMesh = Agent.GetComponent<NavMeshAgent>();
@@ -72,10 +71,11 @@ namespace Pathfinding {
         }
 
         /// <summary>
-        /// 
+        /// Takes updates from VLM to update the edges of the node
         /// </summary>
         /// <param name="updates"></param>
         public void UpdateEdgeWeights(string updates) {
+            Debug.Log($"[Python]: Updating Edge Weights");
             //Make sure string is not empty
             if (string.IsNullOrEmpty(updates)) { return; }
             
@@ -83,8 +83,12 @@ namespace Pathfinding {
             GPTMessage[] message = JsonConvert.DeserializeObject<GPTMessage[]>(updates);
             // Update cost for each node.
             foreach (var update in message) {
-                var node = NodeLookup[update.name];
-                UpdateEdgeWeight(node, update.crowdCost, update.fireCost);
+                // Make sure node exists, and then update
+                if (NodeLookup.TryGetValue(update.name, out var node)) {
+                    UpdateEdgeWeight(node, update.crowdCost, update.fireCost);
+                } else {
+                    Debug.LogWarning($"[UpdateEdgeWeights] Node '{update.name}' not found in NodeLookup. Skipping.");
+                }
             }
         }
         
@@ -99,6 +103,7 @@ namespace Pathfinding {
         private void UpdateEdgeWeight(Node node, float crowdCost, float fireCost) {
             foreach (var edge in node.Edges) {
                 // Update the outgoing edge weight
+                Debug.Log($"{node.name} -> {edge.TargetNode.name}: {edge.DistanceCost} ");
                 edge.Weight = edge.DistanceCost + crowdCost + fireCost;
                 
                 // Update the incoming edge weight
@@ -109,6 +114,5 @@ namespace Pathfinding {
                 }
             }
         }
-
     }
 }
