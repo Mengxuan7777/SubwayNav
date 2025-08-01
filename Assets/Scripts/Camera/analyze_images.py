@@ -4,7 +4,33 @@ import os
 import sys
 import json
 import re
+import csv
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
+from datetime import datetime
+
+# --- Log File for Tokens ---
+# Make sure log directory exists
+LogDirectory = "C:/Users/tower/Documents/Unity Projects/SubwayNav/Assets/StreamingAssets/Log"
+os.makedirs(LogDirectory, exist_ok=True)
+
+# Create unique file per run
+runTimestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+LogFile = os.path.join(LogDirectory, f"token_usage_log_{runTimestamp}.csv")
+token_log_lock = Lock()
+
+def reset_token_log_csv(log_file=LogFile):
+    with token_log_lock, open(log_file, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["timestamp", "total_tokens"])
+
+def log_token_usage_csv(token_count, log_file=LogFile):
+    with token_log_lock, open(log_file, "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([datetime.now().isoformat(), token_count])
+
+# Reset the log file:
+reset_token_log_csv()
 
 # --- Key and API Setup ---
 with open("C:/Users/tower/Documents/API Keys/OpenAI_ChatGPT_Key.txt", "r") as f:
@@ -67,6 +93,14 @@ def build_message_sequence(reference_msgs, batch_msgs):
     })
     return messages
 
+def log_token_usage_csv(token_count, log_file=LogFile):
+    log_exists = os.path.exists(log_file)
+    with token_log_lock, open(log_file, "a", newline="") as f:
+        writer = csv.writer(f)
+        if not log_exists:
+            writer.writerow(["timestamp", "total_tokens"])
+        writer.writerow([datetime.now().isoformat(), token_count])
+
 # --- Main batch analyzer ---
 def analyze_images_with_refs(batch_image_paths, reference_msgs):
     batch_msgs = preprocess_batch_images(batch_image_paths)
@@ -78,6 +112,13 @@ def analyze_images_with_refs(batch_image_paths, reference_msgs):
             response_format={"type": "text"},
             max_tokens=500
         )
+        
+        # --- Log usage in CSV ---
+        if hasattr(response, "usage") and response.usage:
+            total_tokens = getattr(response.usage, "total_tokens", None)
+            if total_tokens is not None:
+                log_token_usage_csv(total_tokens)
+
         content = response.choices[0].message.content
         try:
             result = extract_json_array(content)
