@@ -1302,7 +1302,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.9119997
+      value: -13.467008
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1310,7 +1310,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 9.871
+      value: 9.643999
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1421,7 +1421,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.1
+  m_VoxelSize: 0.033333335
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 6c3d40257577cfa4bbabdf008bd06e26, type: 2}
   m_BuildHeightMesh: 0
@@ -3086,6 +3086,84 @@ MonoBehaviour:
   NeighbourNodes:
   - {fileID: 653587354}
   - {fileID: 2146381657}
+--- !u!1 &132009664
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 132009666}
+  - component: {fileID: 132009665}
+  m_Layer: 0
+  m_Name: RiderManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &132009665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 132009664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74622e7894659c34caaebf9c86b40339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  riderPool: {fileID: 621266638}
+  southGroup:
+    groupName: 
+    spawnPoints:
+    - {fileID: 1944120007}
+    - {fileID: 2126037544}
+    - {fileID: 1191816248}
+    - {fileID: 293120669}
+    - {fileID: 1346063011}
+    - {fileID: 1771028522}
+    - {fileID: 583250548}
+    targetPoints:
+    - {fileID: 1336534765}
+    - {fileID: 853628519}
+    spawnInterval: 4
+  northGroup:
+    groupName: 
+    spawnPoints:
+    - {fileID: 1509537667}
+    - {fileID: 196796318}
+    - {fileID: 653587349}
+    - {fileID: 128632967}
+    - {fileID: 1773840994}
+    - {fileID: 1309239778}
+    - {fileID: 1645549995}
+    targetPoints:
+    - {fileID: 278725359}
+    - {fileID: 1170969403}
+    spawnInterval: 2
+  circlingGroup:
+    groupName: 
+    spawnPoints: []
+    targetPoints: []
+    spawnInterval: 2
+--- !u!4 &132009666
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 132009664}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.25799, y: 6.7155304, z: -1.1702213}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &138460248
 GameObject:
   m_ObjectHideFlags: 0
@@ -16864,6 +16942,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2083331441860142906, guid: 01f820441c06e5146a2152eaa4633ae4, type: 3}
   m_PrefabInstance: {fileID: 617488956}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &621266637
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 621266639}
+  - component: {fileID: 621266638}
+  m_Layer: 0
+  m_Name: RiderPooler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &621266638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 621266637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2311bfa0cc0532419e85f77982b2f79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabList:
+  - prefab: {fileID: 8527397095791072422, guid: 9c6e9d81c4e78244689ec37ef62facec, type: 3}
+    size: 30
+  - prefab: {fileID: 7323008508947678553, guid: 01b354db3f64a25429e93d49866bc3b4, type: 3}
+    size: 30
+--- !u!4 &621266639
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 621266637}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.25799, y: 6.7155304, z: -1.1702213}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &635522049
 GameObject:
   m_ObjectHideFlags: 0
@@ -40671,7 +40798,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 143.485
+      value: 133.93
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalPosition.y
@@ -40679,7 +40806,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 34.255
+      value: 34.028
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalRotation.w
@@ -44635,7 +44762,7 @@ Transform:
   m_GameObject: {fileID: 1620936476}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -23.492, y: -3.61, z: 12.864}
+  m_LocalPosition: {x: -48.48, y: -3.61, z: 12.86}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -56568,7 +56695,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2144469413}
   - component: {fileID: 2144469414}
-  - component: {fileID: 2144469415}
   m_Layer: 0
   m_Name: PedSpawnManager
   m_TagString: Untagged
@@ -56628,56 +56754,8 @@ MonoBehaviour:
   - {fileID: 1670228159}
   - {fileID: 560446340}
   - {fileID: 1597944057}
-  npcsPerSpawnPoint: 0
+  npcsPerSpawnPoint: 2
   spawnInterval: 2
---- !u!114 &2144469415
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2144469411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 213f10261b822444186255ba44f63667, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  riderPrefabs:
-  - {fileID: 8527397095791072422, guid: 9c6e9d81c4e78244689ec37ef62facec, type: 3}
-  - {fileID: 7323008508947678553, guid: 01b354db3f64a25429e93d49866bc3b4, type: 3}
-  - {fileID: 5239466802915676597, guid: 95bc672d8dc4bda4fb5945a3bfbdfa17, type: 3}
-  - {fileID: 6270895591748109422, guid: 086452cc20a10164299832168eb08de2, type: 3}
-  - {fileID: 932351807926706563, guid: 59d08ee93553a254eb8ed5144e000691, type: 3}
-  - {fileID: 7881635418459381562, guid: 19baeead65a64ff46bbc6edd80f3857a, type: 3}
-  - {fileID: 6756429825524421183, guid: 16f110eaf41bdf142a87032b67c43b3e, type: 3}
-  - {fileID: 1267656009562520650, guid: ff7ebf51d9100f148b03bcfa8edabe73, type: 3}
-  - {fileID: 3855748191278246145, guid: 2a4b751f3d48e744e8fa8aa5110d41b3, type: 3}
-  - {fileID: 6227273843714712763, guid: d5e39bd83e00e784a8fb320aebecfd1e, type: 3}
-  lowDenseSpawnPoints:
-  - {fileID: 1645549995}
-  - {fileID: 691794543}
-  - {fileID: 653587349}
-  - {fileID: 1560256525}
-  - {fileID: 1509537667}
-  lowDenseTargetPoints:
-  - {fileID: 278725359}
-  - {fileID: 1170969403}
-  ridersPerLowDenseSpawn: 15
-  lowDenseSpawnInterval: 5
-  highDenseSpawnPoints:
-  - {fileID: 1944120007}
-  - {fileID: 2126037544}
-  - {fileID: 293120669}
-  - {fileID: 1346063011}
-  - {fileID: 196796318}
-  - {fileID: 1773840994}
-  highDenseTargetPoints:
-  - {fileID: 1336534765}
-  - {fileID: 853628519}
-  ridersPerHighDenseSpawn: 20
-  highDenseSpawnInterval: 4
-  spawnRadius: 1.2
-  waitTimeAfterArrival: 4
 --- !u!1 &2144522001
 GameObject:
   m_ObjectHideFlags: 0
@@ -531747,6 +531825,8 @@ SceneRoots:
   - {fileID: 1415168718}
   - {fileID: 1472576026}
   - {fileID: 2144469413}
+  - {fileID: 132009666}
+  - {fileID: 621266639}
   - {fileID: 799771245}
   - {fileID: 970295605}
   - {fileID: 1337311098}
