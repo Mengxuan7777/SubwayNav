@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 using Priority_Queue;
+using Utils;
 
 namespace Pathfinding {
     public class AStar {
@@ -78,12 +80,10 @@ namespace Pathfinding {
         /// <param name="node">The starting node.</param>
         /// <param name="targets">Exit Nodes</param>
         /// <returns>The minimum distance from the given node to any target node.</returns>
-        private static float MinHeuristic(Node node, List<Node> targets)
-        {
+        private static float MinHeuristic(Node node, List<Node> targets) {
             float min = float.MaxValue;
-            foreach (var t in targets)
-            {
-                float dist = Vector3.Distance(node.Position, t.Position); // Euclidean in 3D
+            foreach (var t in targets) {
+                float dist = Vector3.Distance(node.Position.ToVector3(), t.Position.ToVector3()); // Euclidean in 3D
                 if (dist < min) min = dist;
             }
             return min;
@@ -96,14 +96,14 @@ namespace Pathfinding {
     public class Node : FastPriorityQueueNode {
         // Parameters
         public string Name { get; }
-        public Vector3 Position;
+        public readonly SerializableVector3 Position;
         public float DangerLevel = 0;
         public readonly List<Edge> Edges = new List<Edge>();
         
         // Constructor
         public Node(string name, Vector3 position) {
             Name = name;
-            Position = position;
+            Position = new SerializableVector3(position);
         }
     }
     
@@ -112,13 +112,15 @@ namespace Pathfinding {
     /// </summary>
     public class Edge {
         // Parameters
-        public readonly Node TargetNode;
+        [JsonIgnore] public readonly Node TargetNode;
+        private readonly string TargetNodeName;
         public float Weight;
         public readonly float DistanceCost;
 
         // Constructor
         public Edge(Node target, float distanceCost) {
             TargetNode = target;
+            TargetNodeName = target.Name;
             DistanceCost = Weight =  distanceCost;
         }
     }

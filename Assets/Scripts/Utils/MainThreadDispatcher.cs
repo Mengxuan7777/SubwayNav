@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Helper class to push tasks back to the main thread
-namespace Camera {
+namespace Utils {
     public class MainThreadDispatcher : MonoBehaviour {
         private static readonly Queue<Action> actions = new Queue<Action>();
 
