@@ -11,7 +11,7 @@ from datetime import datetime
 
 # --- Log File for Tokens ---
 # Make sure log directory exists
-LogDirectory = "C:/Users/tower/Documents/Unity Projects/SubwayNav/Assets/StreamingAssets/Log"
+LogDirectory = "C:/Users/tower/Documents/Unity Projects/SubwayNav/Assets/StreamingAssets/TokenLog"
 os.makedirs(LogDirectory, exist_ok=True)
 
 # Create unique file per run
