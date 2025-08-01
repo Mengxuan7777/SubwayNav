@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using UnityEngine;
+using Utils;
 using Debug = UnityEngine.Debug;
 
 namespace Camera {
@@ -58,7 +59,7 @@ namespace Camera {
             await RunPythonScript(path, referenceImageFolder);
             
             // Re-calculate the path using A*
-            pathfindingManager.ReCalculatePath();
+            await pathfindingManager.ReCalculatePath();
             try {
                 
             } catch (Exception e) {

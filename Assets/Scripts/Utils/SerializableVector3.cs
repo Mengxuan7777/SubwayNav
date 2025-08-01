@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace User_Emergency_Exit {
+namespace Utils {
     [System.Serializable]
     public class SerializableVector3 {
         public float x;

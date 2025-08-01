@@ -1,4 +1,4 @@
-namespace Camera {
+namespace Utils {
     // Helper class to update edge costs on the graph
     public class GPTMessage {
         public string name;
