@@ -19,7 +19,6 @@ namespace Pathfinding {
                 // Initialize the client only once
                 var apiKey = File.ReadAllText(filepath); // This is synchronous but runs only once
                 client = new ChatClient("gpt-4o", apiKey);
-                Debug.Log("ChatClient initialized successfully.");
             } catch (Exception e) {
                 Debug.LogError($"[LLM Pathfinding] Failed to initialize ChatClient: {e.Message}");
             }

@@ -133,9 +133,13 @@ namespace Pathfinding {
             // Set agent to the next destination
             if (AgentNavMesh.remainingDistance <= AgentNavMesh.stoppingDistance + 1 && (PathIndex < PathNodesString.Count || PathIndex < PathNodes.Count)) {
                 if (LLMPathfindingEnabled ) {
-                    if (PathNodesString[PathIndex] == "Agent") PathIndex++;
-                    currentNode = NodeLookup[PathNodesString[PathIndex]];
-                    if (PathIndex > 0) OldNode = NodeLookup[PathNodesString[PathIndex - 1]];
+                    if (PathNodesString[PathIndex] == "Agent"){
+                        PathIndex++;
+                        currentNode = NodeLookup[PathNodesString[PathIndex]];
+                    } else {
+                        currentNode = NodeLookup[PathNodesString[PathIndex]];
+                        if (PathIndex > 0) OldNode = NodeLookup[PathNodesString[PathIndex - 1]];
+                    }
                 } else {
                     currentNode = PathNodes[PathIndex];
                     if (PathIndex > 0) OldNode = PathNodes[PathIndex - 1];
@@ -146,7 +150,7 @@ namespace Pathfinding {
                 PathIndex++;
             }
             //Debug.Log($"Agent Destination:{AgentNavMesh.destination}");
-            Debug.Log($"AGENT STATUS. Stopped: {AgentNavMesh.isStopped}, HasPath: {AgentNavMesh.hasPath}");
+            //Debug.Log($"AGENT STATUS. Stopped: {AgentNavMesh.isStopped}, HasPath: {AgentNavMesh.hasPath}");
             
         }
     }
