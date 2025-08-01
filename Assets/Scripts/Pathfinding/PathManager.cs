@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Camera;
 using UnityEngine;
 using UnityEngine.AI;
 using Newtonsoft.Json;
 using Utils;
+using System;
+using System.IO;
+using Debug = UnityEngine.Debug;
 
 namespace Pathfinding {
     public class PathManager : MonoBehaviour {
@@ -34,6 +37,7 @@ namespace Pathfinding {
         // Constants
         private const int crowdPenaltyMultiplier = 5,
             firePenaltyMultiplier = 5000;
+        public readonly string logFilePath = Application.streamingAssetsPath + "/TimeLog/" +"TEST1.csv";
         
         private void Start() {
             // Gather agent info
@@ -62,6 +66,7 @@ namespace Pathfinding {
         /// Recalculates the path based on the new edge weights.
         /// </summary>
         public async Task ReCalculatePath() {
+            var stopwatch = Stopwatch.StartNew();
             Debug.Log("Recalculating Path");
             // If agent is on a path, determine the nearest node. 
             if (AgentNavMesh.hasPath) {
@@ -69,6 +74,7 @@ namespace Pathfinding {
                 var d2 = Vector3.Distance(Agent.transform.position, AgentNavMesh.destination);
                 StartNode = d2 <= d1 ? currentNode : OldNode;
             }
+
             // Update agent path
             pathfinding = true;
             PathIndex = 0;
@@ -78,6 +84,9 @@ namespace Pathfinding {
                 PathNodes = pathfinder.FindPath(NodeCount, StartNode, ExitsList);
             }
             pathfinding = false;
+            // Log time
+            stopwatch.Stop();
+            LogExecutionTime("ReCalculatePath", stopwatch.ElapsedMilliseconds);
         }
 
         /// <summary>
@@ -152,6 +161,20 @@ namespace Pathfinding {
             //Debug.Log($"Agent Destination:{AgentNavMesh.destination}");
             //Debug.Log($"AGENT STATUS. Stopped: {AgentNavMesh.isStopped}, HasPath: {AgentNavMesh.hasPath}");
             
+        }
+        
+        /// <summary>
+        /// Logs the time it takes for a method to run.
+        /// </summary>
+        /// <param name="methodName"></param>
+        /// <param name="executionTimeMs"></param>
+        private void LogExecutionTime(string methodName, long executionTimeMs) {
+            if (!File.Exists(logFilePath)) {
+                File.AppendAllText(logFilePath, "Timestamp,Method,ExecutionTime(ms)\n");
+            }
+
+            var logEntry = $"{DateTime.Now:O},{methodName},{executionTimeMs}\n";
+            File.AppendAllText(logFilePath, logEntry);
         }
     }
 }

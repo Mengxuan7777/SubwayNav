@@ -1,15 +1,18 @@
 using System;
 using System.Collections;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Debug = UnityEngine.Debug;
 
 namespace Camera {
     public class CameraManager : MonoBehaviour {
         // References
         [Header("References")]
         [SerializeField] public ImageAnalyzer imageAnalyzer;
+        private static string logFilePath;
         
         // Camera References & Info
         [Header("Cameras")]
@@ -52,6 +55,9 @@ namespace Camera {
         }
 
         private void Start() {
+            // Get file directory
+            logFilePath = imageAnalyzer.logFilePath;
+            
             // Set textures to cameras
             for (int i = 0; i < cameras.Length; i++) {
                 cameras[i].targetTexture = cameraRenderTextures[i];
@@ -61,6 +67,7 @@ namespace Camera {
             if (AutomaticScreenshot) {
                 StartCoroutine(ScreenshotRoutine());
             }
+            
         }
 
         private void OnDisable() {
@@ -109,6 +116,7 @@ namespace Camera {
         /// Warning: This only works in Unity 2018.2+
         /// </summary>
         private IEnumerator TakeScreenshots() {
+            var stopwatch = Stopwatch.StartNew();
             for (int i = 0; i < cameras.Length; i++) {
                 // Wait until you have a slot for a new request
                 while (gpuReadbacksInProgress >= MaxConcurrentReadbacks)
@@ -148,10 +156,13 @@ namespace Camera {
             // Wait for any remaining readbacks to fully complete
             while (gpuReadbacksInProgress > 0)
                 yield return null;
+            // Log time
+            stopwatch.Stop();
+            LogExecutionTime("TakeScreenShots", stopwatch.ElapsedMilliseconds);
         }
         
         /// <summary>
-        /// Pushes folder creation to background thread, but notify the main thread on completion
+        /// Pushes folder creation to a background thread, but notify the main thread on completion
         /// </summary>
         /// <param name="folderPath"></param>
         private static async Task CreateScreenshotFolderAsync(string folderPath) {
@@ -223,6 +234,20 @@ namespace Camera {
                 cameraRenderTextures[i] = new RenderTexture(width, height, 24);
                 cameraTextures[i] = new Texture2D(width, height, TextureFormat.RGB24, false);
             }
+        }
+        
+        /// <summary>
+        /// Logs the time it takes for a method to run.
+        /// </summary>
+        /// <param name="methodName"></param>
+        /// <param name="executionTimeMs"></param>
+        private void LogExecutionTime(string methodName, long executionTimeMs) {
+            if (!File.Exists(logFilePath)) {
+                File.AppendAllText(logFilePath, "Timestamp,Method,ExecutionTime(ms)\n");
+            }
+
+            var logEntry = $"{DateTime.Now:O},{methodName},{executionTimeMs}\n";
+            File.AppendAllText(logFilePath, logEntry);
         }
     }
 }
