@@ -41,6 +41,7 @@ namespace Pathfinding {
                 foreach (var edge in current.Edges) {
                     Node neighbor = edge.TargetNode;
                     float tentativeG = gScore[current] + edge.Weight;
+                    //Debug.Log($"Evaluating Node: {neighbor.Name}, tentativeG: {tentativeG}, danger: {neighbor.DangerLevel}, edge.Weight: {edge.Weight}");
 
                     if (!gScore.ContainsKey(neighbor) || tentativeG < gScore[neighbor]) {
                         cameFrom[neighbor] = current;
@@ -105,6 +106,23 @@ namespace Pathfinding {
             Name = name;
             Position = new SerializableVector3(position);
         }
+        
+        /// <summary>
+        /// Clones all nodes to get an snapshot
+        /// </summary>
+        /// <param name="cloneMap"></param>
+        /// <returns></returns>
+        public Node Clone(Dictionary<Node, Node> cloneMap) {
+            if (cloneMap.TryGetValue(this, out var cached))
+                return cached;
+            var clone = new Node(this.Name, this.Position.ToVector3()) {
+                DangerLevel = this.DangerLevel,
+            };
+            cloneMap[this] = clone;
+            // Do NOT copy edges here yet; add them after all nodes are cloned.
+            return clone;
+        }
+
     }
     
     /// <summary>
@@ -123,5 +141,19 @@ namespace Pathfinding {
             TargetNodeName = target.Name;
             DistanceCost = Weight =  distanceCost;
         }
+        
+        /// <summary>
+        /// Clones edges to create a snapshot of the graph
+        /// </summary>
+        /// <param name="original">Original edge</param>
+        /// <param name="nodeMap">nodeMap</param>
+        /// <returns></returns>
+        public static Edge Clone(Edge original, Dictionary<Node, Node> nodeMap) {
+            // Deep copy the edge, but point to the CLONED target node.
+            return new Edge(nodeMap[original.TargetNode], original.DistanceCost) {
+                Weight = original.Weight
+            };
+        }
+
     }
 }

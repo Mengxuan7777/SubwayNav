@@ -19,7 +19,6 @@ namespace Pathfinding {
                 // Initialize the client only once
                 var apiKey = File.ReadAllText(filepath); // This is synchronous but runs only once
                 client = new ChatClient("gpt-4o", apiKey);
-                Debug.Log("ChatClient initialized successfully.");
             } catch (Exception e) {
                 Debug.LogError($"[LLM Pathfinding] Failed to initialize ChatClient: {e.Message}");
             }
@@ -33,10 +32,10 @@ namespace Pathfinding {
 
                 // Get Response from ChatGPT
                 ChatCompletion completion = await client.CompleteChatAsync(
-                    @$"Below is information of all the nodes, the exist nodes, and the start node of a graph. 
-                                        This graph describes the subway station. Using the information from this graph, find the 
-                                        path to the safest exit. Return this path in the form of a list of nodes that make up the path.
-                                        Do not provide the 'Agent' node. Do not provide any explanation or reasoning.
+                    @$"Below is the information for all nodes, exit nodes, and the start node
+                                     of a graph representing a subway station. Using this graph, identify the 
+                                     path to the safest exit. Return the path as a list of nodes.  Do not provide
+                                     any explanation or reasoning.
                                        {jsonGraph}");
 
                 var response = completion.Content[0].Text;

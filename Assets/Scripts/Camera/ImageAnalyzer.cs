@@ -9,25 +9,29 @@ using Utils;
 using Debug = UnityEngine.Debug;
 
 namespace Camera {
-    public class ImageAnalyzer: MonoBehaviour {
+    public class ImageAnalyzer : MonoBehaviour {
         // References
-        [SerializeField]  public CameraManager cameraManager;
-        [SerializeField]  public Pathfinding.PathManager pathfindingManager;
+        [SerializeField] public CameraManager cameraManager;
+        [SerializeField] public Pathfinding.PathManager pathfindingManager;
 
         // Path to your Python interpreter and script
-        private readonly string pythonExePath = @"C:\Users\tower\AppData\Local\Microsoft\WindowsApps\python.exe"; 
+        private readonly string pythonExePath = @"C:\Users\tower\AppData\Local\Microsoft\WindowsApps\python.exe";
         private readonly string pythonScriptPath = Path.Combine(Application.dataPath, "Scripts/Camera/", "analyze_images.py");
-        
+
         // Reference Image folder
         private static readonly string referenceImageFolder = Application.streamingAssetsPath + "/VLM_Training";
-        
-        // ReSharper disable Unity.PerformanceAnalysis
-        /// <summary>
-        /// Pushes analysis of images and calculation of path to a background thread
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="extension"></param>
-        /// <returns></returns>
+
+        // Log file path
+        public string logFilePath;
+
+        private void Start() {
+            logFilePath = pathfindingManager.logFilePath;
+            // Ensure the log file has a header
+            if (!File.Exists(logFilePath)) {
+                File.AppendAllText(logFilePath, "Timestamp,Method,ExecutionTime(ms)\n");
+            }
+        }
+
         public IEnumerator AnalyzeImagesAndRecalculatePathCoroutine(string path, string extension = "jpg") {
             // Start the analysis/task
             var analysisTask = AnalyzeImagesAndRecalculatePath(path, extension);
@@ -39,8 +43,9 @@ namespace Camera {
             if (analysisTask.Exception != null)
                 Debug.LogError(analysisTask.Exception);
         }
+
         
-        
+        // ReSharper disable Unity.PerformanceAnalysis
         /// <summary>
         /// Calls python function to analyze the images using the OpenAI AI
         /// </summary>
@@ -58,15 +63,16 @@ namespace Camera {
             // It also updated the edge costs
             await RunPythonScript(path, referenceImageFolder);
             
+            // Set up barrier to prevent path recalculation before RuntPythonScript ends
+            var barrier = new TaskCompletionSource<bool>();
+            MainThreadDispatcher.Enqueue(() => barrier.SetResult(true));
+            await barrier.Task;
+            
             // Re-calculate the path using A*
             await pathfindingManager.ReCalculatePath();
-            try {
-                
-            } catch (Exception e) {
-                Debug.LogError($"[Python]: An error occurred while analyzing images: {e.Message}");;
-            }
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         /// <summary>
         /// Calls python function to analyze images and updated edge weights
         /// </summary>
@@ -74,6 +80,7 @@ namespace Camera {
         /// <param name="referenceFolder"></param>
         /// <returns></returns>
         private async Task RunPythonScript(string imageFolder, string referenceFolder) {
+            var stopwatch = Stopwatch.StartNew();
             await Task.Run(() => {
                 var start = new ProcessStartInfo {
                     FileName = pythonExePath,
@@ -83,8 +90,7 @@ namespace Camera {
                     RedirectStandardError = true,
                     CreateNoWindow = true
                 };
-                using var process = new Process();
-                process.StartInfo = start;
+                using var process = new Process { StartInfo = start };
                 process.Start();
 
                 // Read errors in the background
@@ -106,8 +112,11 @@ namespace Camera {
                 }
                 process.WaitForExit();
             });
+            stopwatch.Stop();
+            LogExecutionTime("RunPythonScript", stopwatch.ElapsedMilliseconds);
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         /// <summary>
         /// Gathers the directories of all the images in the given folder.
         /// </summary>
@@ -123,8 +132,12 @@ namespace Camera {
             } catch (Exception e) {
                 Debug.LogWarning($"An error occurred while searching for images: {e.Message}");
             }
-
             return images;
+        }
+
+        private void LogExecutionTime(string methodName, long executionTimeMs) {
+            var logEntry = $"{DateTime.Now:O},{methodName},{executionTimeMs}\n";
+            File.AppendAllText(logFilePath, logEntry);
         }
     }
 }

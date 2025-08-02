@@ -1,8 +1,10 @@
+using Camera;
+using UnityEditor;
 using UnityEngine;
 
-namespace Camera {
+namespace Agent {
     public class SuspendOperation : MonoBehaviour {
-    
+
         // References
         [SerializeField] public CameraManager cameraManager;
 
@@ -11,8 +13,12 @@ namespace Camera {
             if (other.gameObject.layer == 7) {
                 Debug.Log("Suspending all operations.");
                 StopCoroutine(cameraManager.ScreenshotRoutine());
+                
+                // Disable Editor
+                if (EditorApplication.isPlaying) EditorApplication.isPlaying = false;
             }
+
+            
         }
-        
     }
 }

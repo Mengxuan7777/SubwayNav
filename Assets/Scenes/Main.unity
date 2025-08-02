@@ -530,6 +530,7 @@ GameObject:
   - component: {fileID: 30259475}
   - component: {fileID: 30259474}
   - component: {fileID: 30259477}
+  - component: {fileID: 30259478}
   m_Layer: 7
   m_Name: Capsule
   m_TagString: Untagged
@@ -637,6 +638,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ac11be6d4ed9cf4cb38afbc171c8bad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &30259478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 30259472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63506376c05c1164885bde9e9f96089b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraManager: {fileID: 1337311099}
 --- !u!1 &30574960
 GameObject:
   m_ObjectHideFlags: 0
@@ -25428,7 +25442,7 @@ MonoBehaviour:
   - {fileID: 1170969408}
   - {fileID: 1336534770}
   - {fileID: 853628524}
-  LLMPathfindingEnabled: 1
+  LLMPathfindingEnabled: 0
   pathfinding: 0
 --- !u!114 &887436461
 MonoBehaviour:
@@ -25894,7 +25908,7 @@ MonoBehaviour:
   - {fileID: 1295853786}
   - {fileID: 72240650}
   - {fileID: 1764433502}
-  fireIndex1: 6
+  fireIndex1: 0
   InitialFireSize1: 0.75
   UpdateFireSize1: 0.75
   fireSpawnDelay1: 0.1
@@ -29426,6 +29440,7 @@ MonoBehaviour:
   NeighbourNodes:
   - {fileID: 1773840999}
   - {fileID: 611007435}
+  - {fileID: 1620936488}
 --- !u!1001 &1038190531
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32936,7 +32951,7 @@ GameObject:
   - component: {fileID: 1191816252}
   - component: {fileID: 1191816253}
   m_Layer: 3
-  m_Name: SouthM
+  m_Name: SM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33530,7 +33545,7 @@ GameObject:
   - component: {fileID: 1221415031}
   - component: {fileID: 1221415033}
   m_Layer: 0
-  m_Name: NorthM
+  m_Name: NM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34010,7 +34025,7 @@ GameObject:
   - component: {fileID: 1230033754}
   - component: {fileID: 1230033755}
   m_Layer: 3
-  m_Name: NorthM
+  m_Name: NM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36986,6 +37001,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   imageAnalyzer: {fileID: 1337311100}
+  pathfindingManager: {fileID: 887436460}
   cameras:
   - {fileID: 1625333321}
   - {fileID: 1570775616}
@@ -37042,6 +37058,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraManager: {fileID: 1337311099}
   pathfindingManager: {fileID: 887436460}
+  logFilePath: 
 --- !u!1 &1337417323
 GameObject:
   m_ObjectHideFlags: 0
@@ -47185,7 +47202,7 @@ GameObject:
   - component: {fileID: 1734831306}
   - component: {fileID: 1734831308}
   m_Layer: 0
-  m_Name: SouthM
+  m_Name: NM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48845,6 +48862,7 @@ MonoBehaviour:
   NeighbourNodes:
   - {fileID: 1027785094}
   - {fileID: 578297204}
+  - {fileID: 1620936488}
 --- !u!1 &1774411195
 GameObject:
   m_ObjectHideFlags: 0

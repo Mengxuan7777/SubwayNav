@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Camera;
 using UnityEngine;
 using UnityEngine.AI;
 using Newtonsoft.Json;
 using Utils;
+using System;
+using System.IO;
+using Debug = UnityEngine.Debug;
 
 namespace Pathfinding {
     public class PathManager : MonoBehaviour {
@@ -34,6 +37,7 @@ namespace Pathfinding {
         // Constants
         private const int crowdPenaltyMultiplier = 5,
             firePenaltyMultiplier = 5000;
+        public readonly string logFilePath = Application.streamingAssetsPath + "/TimeLog/" +"TEST1.csv";
         
         private void Start() {
             // Gather agent info
@@ -44,14 +48,17 @@ namespace Pathfinding {
             // Gather Information Regarding Nodes
             NodeCount = Nodes.Length;
             
-            // Create Node List/Dictionary
+            // Create Node List for Exists
             foreach (var t in Exits) {
                 ExitsList.Add(t.node);
             }
+            
+            // Create Node List for All Nodes
             foreach (var node in Nodes) {
                 NodeList.Add(node.node);
                 NodeLookup.Add(node.name, node.node);
             }
+            NodeList.Add(StartNode);
         }
 
         private void Update() {
@@ -62,6 +69,7 @@ namespace Pathfinding {
         /// Recalculates the path based on the new edge weights.
         /// </summary>
         public async Task ReCalculatePath() {
+            var stopwatch = Stopwatch.StartNew();
             Debug.Log("Recalculating Path");
             // If agent is on a path, determine the nearest node. 
             if (AgentNavMesh.hasPath) {
@@ -69,16 +77,58 @@ namespace Pathfinding {
                 var d2 = Vector3.Distance(Agent.transform.position, AgentNavMesh.destination);
                 StartNode = d2 <= d1 ? currentNode : OldNode;
             }
-            // Update agent path
+            
+
+            // Get snapshot and Update agent path
             pathfinding = true;
+            var start = NodeList.Find(n=> n.Name == StartNode.Name);
+            var (clonedNodes, clonedStart, clonedTargets) = SnapshotGraph(NodeList, start, ExitsList);
             PathIndex = 0;
             if (LLMPathfindingEnabled) {
-                PathNodesString = await LLMPathfinding.FindPath(NodeList, ExitsList, StartNode);
+                PathNodesString = await LLMPathfinding.FindPath(clonedNodes, clonedTargets, clonedStart);
             } else {
-                PathNodes = pathfinder.FindPath(NodeCount, StartNode, ExitsList);
+                PathNodes = pathfinder.FindPath(clonedNodes.Count, clonedStart, clonedTargets);
             }
             pathfinding = false;
+            // Log time
+            stopwatch.Stop();
+            LogExecutionTime("ReCalculatePath", stopwatch.ElapsedMilliseconds);
         }
+
+        /// <summary>
+        /// Generates a snapshot of the subway station graph
+        /// </summary>
+        /// <param name="allNodes">List of all nodes</param>
+        /// <param name="startNode">Starting Node</param>
+        /// <param name="targetNodes">List of target nodes</param>
+        /// <returns></returns>
+        private static (List<Node> clonedNodes, Node clonedStart, List<Node> clonedTargets)
+            SnapshotGraph(List<Node> allNodes, Node startNode, List<Node> targetNodes) {
+            // Clone all nodes 
+            var nodeMap = new Dictionary<Node, Node>();
+            foreach (var original in allNodes)
+                original.Clone(nodeMap);
+
+            // Clone edges
+            foreach (var original in allNodes) {
+                var clone = nodeMap[original];
+                clone.Edges.Clear();
+                foreach (var edge in original.Edges)
+                    clone.Edges.Add(Edge.Clone(edge, nodeMap));
+            }
+
+            // Map start & targets to clones
+            var clonedStart = nodeMap[startNode];
+            var clonedTargets = new List<Node>();
+            foreach (var t in targetNodes) {
+                clonedTargets.Add(nodeMap[t]);
+            }
+               
+
+            
+            return (new List<Node>(nodeMap.Values), clonedStart, clonedTargets);
+        }
+
 
         /// <summary>
         /// Takes updates from VLM to update the edges of the node
@@ -118,8 +168,10 @@ namespace Pathfinding {
             
             // Update incoming edges
             foreach (var edge in node.Edges) {
-                foreach (var inEdge in edge.TargetNode.Edges) {
+                var neighborNode = edge.TargetNode;  
+                foreach (var inEdge in neighborNode.Edges) {
                     if (inEdge.TargetNode == node) {
+                        //Debug.Log($"[{node.Name}] Updating Edge: {neighborNode.Name} -> {inEdge.TargetNode.Name}");
                         inEdge.Weight = inEdge.DistanceCost + node.DangerLevel;
                     }
                 }
@@ -133,9 +185,13 @@ namespace Pathfinding {
             // Set agent to the next destination
             if (AgentNavMesh.remainingDistance <= AgentNavMesh.stoppingDistance + 1 && (PathIndex < PathNodesString.Count || PathIndex < PathNodes.Count)) {
                 if (LLMPathfindingEnabled ) {
-                    if (PathNodesString[PathIndex] == "Agent") PathIndex++;
-                    currentNode = NodeLookup[PathNodesString[PathIndex]];
-                    if (PathIndex > 0) OldNode = NodeLookup[PathNodesString[PathIndex - 1]];
+                    if (PathNodesString[PathIndex] == "Agent"){
+                        PathIndex++;
+                        currentNode = NodeLookup[PathNodesString[PathIndex]];
+                    } else {
+                        currentNode = NodeLookup[PathNodesString[PathIndex]];
+                        if (PathIndex > 0) OldNode = NodeLookup[PathNodesString[PathIndex - 1]];
+                    }
                 } else {
                     currentNode = PathNodes[PathIndex];
                     if (PathIndex > 0) OldNode = PathNodes[PathIndex - 1];
@@ -146,8 +202,21 @@ namespace Pathfinding {
                 PathIndex++;
             }
             //Debug.Log($"Agent Destination:{AgentNavMesh.destination}");
-            Debug.Log($"AGENT STATUS. Stopped: {AgentNavMesh.isStopped}, HasPath: {AgentNavMesh.hasPath}");
-            
+            //Debug.Log($"AGENT STATUS. Stopped: {AgentNavMesh.isStopped}, HasPath: {AgentNavMesh.hasPath}");
+        }
+        
+        /// <summary>
+        /// Logs the time it takes for a method to run.
+        /// </summary>
+        /// <param name="methodName"></param>
+        /// <param name="executionTimeMs"></param>
+        private void LogExecutionTime(string methodName, long executionTimeMs) {
+            if (!File.Exists(logFilePath)) {
+                File.AppendAllText(logFilePath, "Timestamp,Method,ExecutionTime(ms)\n");
+            }
+
+            var logEntry = $"{DateTime.Now:O},{methodName},{executionTimeMs}\n";
+            File.AppendAllText(logFilePath, logEntry);
         }
     }
 }

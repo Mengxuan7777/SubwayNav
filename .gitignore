@@ -71,3 +71,6 @@ crashlytics-build.properties
 
 # Crash Logs
 *.1.blob
+
+# Log Files
+/[Aa]ssets/[Ss]treamingAssets/Log
