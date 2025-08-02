@@ -48,14 +48,17 @@ namespace Pathfinding {
             // Gather Information Regarding Nodes
             NodeCount = Nodes.Length;
             
-            // Create Node List/Dictionary
+            // Create Node List for Exists
             foreach (var t in Exits) {
                 ExitsList.Add(t.node);
             }
+            
+            // Create Node List for All Nodes
             foreach (var node in Nodes) {
                 NodeList.Add(node.node);
                 NodeLookup.Add(node.name, node.node);
             }
+            NodeList.Add(StartNode);
         }
 
         private void Update() {
@@ -74,20 +77,58 @@ namespace Pathfinding {
                 var d2 = Vector3.Distance(Agent.transform.position, AgentNavMesh.destination);
                 StartNode = d2 <= d1 ? currentNode : OldNode;
             }
+            
 
-            // Update agent path
+            // Get snapshot and Update agent path
             pathfinding = true;
+            var start = NodeList.Find(n=> n.Name == StartNode.Name);
+            var (clonedNodes, clonedStart, clonedTargets) = SnapshotGraph(NodeList, start, ExitsList);
             PathIndex = 0;
             if (LLMPathfindingEnabled) {
-                PathNodesString = await LLMPathfinding.FindPath(NodeList, ExitsList, StartNode);
+                PathNodesString = await LLMPathfinding.FindPath(clonedNodes, clonedTargets, clonedStart);
             } else {
-                PathNodes = pathfinder.FindPath(NodeCount, StartNode, ExitsList);
+                PathNodes = pathfinder.FindPath(clonedNodes.Count, clonedStart, clonedTargets);
             }
             pathfinding = false;
             // Log time
             stopwatch.Stop();
             LogExecutionTime("ReCalculatePath", stopwatch.ElapsedMilliseconds);
         }
+
+        /// <summary>
+        /// Generates a snapshot of the subway station graph
+        /// </summary>
+        /// <param name="allNodes">List of all nodes</param>
+        /// <param name="startNode">Starting Node</param>
+        /// <param name="targetNodes">List of target nodes</param>
+        /// <returns></returns>
+        private static (List<Node> clonedNodes, Node clonedStart, List<Node> clonedTargets)
+            SnapshotGraph(List<Node> allNodes, Node startNode, List<Node> targetNodes) {
+            // Clone all nodes 
+            var nodeMap = new Dictionary<Node, Node>();
+            foreach (var original in allNodes)
+                original.Clone(nodeMap);
+
+            // Clone edges
+            foreach (var original in allNodes) {
+                var clone = nodeMap[original];
+                clone.Edges.Clear();
+                foreach (var edge in original.Edges)
+                    clone.Edges.Add(Edge.Clone(edge, nodeMap));
+            }
+
+            // Map start & targets to clones
+            var clonedStart = nodeMap[startNode];
+            var clonedTargets = new List<Node>();
+            foreach (var t in targetNodes) {
+                clonedTargets.Add(nodeMap[t]);
+            }
+               
+
+            
+            return (new List<Node>(nodeMap.Values), clonedStart, clonedTargets);
+        }
+
 
         /// <summary>
         /// Takes updates from VLM to update the edges of the node
@@ -127,8 +168,10 @@ namespace Pathfinding {
             
             // Update incoming edges
             foreach (var edge in node.Edges) {
-                foreach (var inEdge in edge.TargetNode.Edges) {
+                var neighborNode = edge.TargetNode;  
+                foreach (var inEdge in neighborNode.Edges) {
                     if (inEdge.TargetNode == node) {
+                        //Debug.Log($"[{node.Name}] Updating Edge: {neighborNode.Name} -> {inEdge.TargetNode.Name}");
                         inEdge.Weight = inEdge.DistanceCost + node.DangerLevel;
                     }
                 }
@@ -160,7 +203,6 @@ namespace Pathfinding {
             }
             //Debug.Log($"Agent Destination:{AgentNavMesh.destination}");
             //Debug.Log($"AGENT STATUS. Stopped: {AgentNavMesh.isStopped}, HasPath: {AgentNavMesh.hasPath}");
-            
         }
         
         /// <summary>

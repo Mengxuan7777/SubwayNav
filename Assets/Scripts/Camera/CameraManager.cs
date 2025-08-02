@@ -12,6 +12,7 @@ namespace Camera {
         // References
         [Header("References")]
         [SerializeField] public ImageAnalyzer imageAnalyzer;
+        [SerializeField] public Pathfinding.PathManager pathfindingManager;
         private static string logFilePath;
         
         // Camera References & Info
@@ -56,7 +57,7 @@ namespace Camera {
 
         private void Start() {
             // Get file directory
-            logFilePath = imageAnalyzer.logFilePath;
+            logFilePath = pathfindingManager.logFilePath;
             
             // Set textures to cameras
             for (int i = 0; i < cameras.Length; i++) {

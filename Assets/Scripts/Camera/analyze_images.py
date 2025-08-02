@@ -44,48 +44,78 @@ def encode_image(image_path):
 
 def make_image_message(img_path):
     fname = os.path.basename(img_path)
+    # Determine mime type
+    ext = os.path.splitext(img_path)[-1].lower()
+    if ext == ".png":
+        mime = "png"
+    else:
+        mime = "jpeg"
     return [
         {"type": "text", "text": f"Filename: {fname}"},
         {
             "type": "image_url",
-            "image_url": {"url": f"data:image/jpeg;base64,{encode_image(img_path)}"}
+            "image_url": f"data:image/{mime};base64,{encode_image(img_path)}"
         }
     ]
-
-# --- Reference image preprocessing ---
+# --- Pre-Process Images ---
 def preprocess_reference_images(ref_image_paths):
     ref_msgs = []
     for img_path in ref_image_paths:
         ref_msgs.extend(make_image_message(img_path))
     return ref_msgs
 
-# --- Batch image preprocessing ---
 def preprocess_batch_images(batch_image_paths):
-    batch_msgs = []
-    for img_path in batch_image_paths:
-        batch_msgs.extend(make_image_message(img_path))
-    return batch_msgs
+    messages = []
+    filename_to_image = {}
+    for image_path in batch_image_paths:
+        with open(image_path, "rb") as f:
+            b64_image = base64.b64encode(f.read()).decode("utf-8")
+        image_type = "jpeg" if image_path.lower().endswith((".jpg", ".jpeg")) else "png"
+        b64_data = f"data:image/{image_type};base64,{b64_image}"
+        fname = os.path.basename(image_path)
 
-def build_message_sequence(reference_msgs, batch_msgs):
-   # Create prompt for reference images
+        # Add to dict
+        filename_to_image[fname] = b64_data
+
+        # Keep building OpenAI messages as normal
+        messages.append({
+            "type": "text",
+            "text": f"Filename: {fname}"
+        })
+        messages.append({
+            "type": "image_url",
+            "image_url": { "url": b64_data }
+        })
+
+    return messages, filename_to_image
+
+def build_message_sequence(reference_msgs, batch_msgs, filename_to_image):
     messages = [{
-            "role": "system",
-            "content": "You are provided with several example images as reference only. Do not output any analysis for these, but use them for comparison if needed."
-        }]
-    # Bundle all reference images in a single context/assistant message, so they are not analyzed
+        "role": "system",
+            "content": (
+                "You are provided with several reference images for context only. These images are captured by "
+                "surveillance cameras in a subway station to monitor fire emergencies and crowd density. "
+                "The image filenames indicate the locations where they were taken. Do not generate any analysis "
+                "for these images. Instead, use them as visual references for comparison when needed."
+        )
+    }]
     if reference_msgs:
         messages.append({
             "role": "assistant",
             "content": reference_msgs
         })
 
-    # Create prompt for images to be analyzed (i.e. batch images)
     user_content = [
-        {"type": "text", "text": (
-            "Now analyze ONLY the following images. For each, return a JSON object with the fields: "
-            "name (filename without extension, string), crowdCost (integer 0-10), fireCost (integer 0-10). "
-            "Respond with a JSON array and nothing else."
-        )}
+        {"type": "text","text": (
+            "You are now provided with a set of images captured by surveillance cameras in a subway station to monitor fire emergencies and crowd levels. "
+            "Each image file name indicates the location where it was taken. Use the file name (without extension) as the value for the 'name' field. "
+            "Analyze ONLY the following images. For each image, return a JSON object with the following fields:\n"
+            "- name: the image file name without extension (as a string)\n"
+            "- crowdCost: an integer from 0 to 10 representing the crowd level (0 = least crowded, 10 = most crowded)\n"
+            "- fireCost: an integer from 0 to 10 representing the fire intensity (0 = no fire, 10 = extreme fire)\n\n"
+            "Respond with a JSON array containing these objects, and provide no additional text."
+            )
+        }
     ] + batch_msgs
     messages.append({
         "role": "user",
@@ -101,10 +131,9 @@ def log_token_usage_csv(token_count, log_file=LogFile):
             writer.writerow(["timestamp", "total_tokens"])
         writer.writerow([datetime.now().isoformat(), token_count])
 
-# --- Main batch analyzer ---
 def analyze_images_with_refs(batch_image_paths, reference_msgs):
-    batch_msgs = preprocess_batch_images(batch_image_paths)
-    messages = build_message_sequence(reference_msgs, batch_msgs)
+    batch_msgs, filename_to_image = preprocess_batch_images(batch_image_paths)
+    messages = build_message_sequence(reference_msgs, batch_msgs, filename_to_image)
     try:
         response = client.chat.completions.create(
             model="gpt-4.1-mini",
@@ -112,7 +141,7 @@ def analyze_images_with_refs(batch_image_paths, reference_msgs):
             response_format={"type": "text"},
             max_tokens=500
         )
-        
+
         # --- Log usage in CSV ---
         if hasattr(response, "usage") and response.usage:
             total_tokens = getattr(response.usage, "total_tokens", None)
@@ -152,7 +181,6 @@ def extract_json_array(text):
         pass
     raise ValueError("Could not extract JSON array from the model output.")
 
-# --- Usage: python analyze_images.py <image_folder> <reference_folder> ---
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: python analyze_images.py <image_folder> <reference_folder>")

@@ -63,6 +63,11 @@ namespace Camera {
             // It also updated the edge costs
             await RunPythonScript(path, referenceImageFolder);
             
+            // Set up barrier to prevent path recalculation before RuntPythonScript ends
+            var barrier = new TaskCompletionSource<bool>();
+            MainThreadDispatcher.Enqueue(() => barrier.SetResult(true));
+            await barrier.Task;
+            
             // Re-calculate the path using A*
             await pathfindingManager.ReCalculatePath();
         }
