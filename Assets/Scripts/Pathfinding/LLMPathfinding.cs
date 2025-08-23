@@ -8,7 +8,8 @@ using UnityEngine;
 
 namespace Pathfinding {
     public class LLMPathfinding {
-        private const string filepath = "/Users/tower/Documents/API Keys/OpenAI_ChatGPT_Key.txt";
+        // private const string filepath = "/Users/tower/Documents/API Keys/OpenAI_ChatGPT_Key.txt";
+        private const string filepath = "C:/Users/jessl/Downloads/api_key.txt";
 
         // Static ChatClient (lazy-loaded or created on-demand for each call)
         private static readonly ChatClient client;

@@ -16,7 +16,7 @@ public class PedestrianMovement : MonoBehaviour {
         if (waypoints != null && waypoints.Length > 0) {
             agent.SetDestination(waypoints[currentWaypointIndex].position);
         } else {
-            Debug.LogWarning("WaypointFollower: No waypoints assigned.");
+            // Debug.LogWarning("WaypointFollower: No waypoints assigned.");
         }
     }
 

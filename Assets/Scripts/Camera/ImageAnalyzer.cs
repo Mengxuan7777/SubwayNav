@@ -15,7 +15,9 @@ namespace Camera {
         [SerializeField] public Pathfinding.PathManager pathfindingManager;
 
         // Path to your Python interpreter and script
-        private readonly string pythonExePath = @"C:\Users\tower\AppData\Local\Microsoft\WindowsApps\python.exe";
+        // private readonly string pythonExePath = @"C:\Users\tower\AppData\Local\Microsoft\WindowsApps\python.exe";
+        private readonly string pythonExePath = @"C:\Users\jessl\anaconda3\python.exe";
+
         private readonly string pythonScriptPath = Path.Combine(Application.dataPath, "Scripts/Camera/", "analyze_images.py");
 
         // Reference Image folder

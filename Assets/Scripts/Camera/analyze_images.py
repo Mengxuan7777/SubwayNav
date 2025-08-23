@@ -5,13 +5,16 @@ import sys
 import json
 import re
 import csv
+import io
+from PIL import Image
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 from datetime import datetime
 
 # --- Log File for Tokens ---
 # Make sure log directory exists
-LogDirectory = "C:/Users/tower/Documents/Unity Projects/SubwayNav/Assets/StreamingAssets/TokenLog"
+# LogDirectory = "C:/Users/tower/Documents/Unity Projects/SubwayNav/Assets/StreamingAssets/TokenLog"
+LogDirectory = "C:/Users/jessl/Downloads/SubwayNav/Assets/StreamingAssets/TokenLog"
 os.makedirs(LogDirectory, exist_ok=True)
 
 # Create unique file per run
@@ -33,9 +36,13 @@ def log_token_usage_csv(token_count, log_file=LogFile):
 reset_token_log_csv()
 
 # --- Key and API Setup ---
-with open("C:/Users/tower/Documents/API Keys/OpenAI_ChatGPT_Key.txt", "r") as f:
+# with open("C:/Users/tower/Documents/API Keys/OpenAI_ChatGPT_Key.txt", "r") as f:
+#     api_key = f.read().strip()
+# client = openai.OpenAI(api_key=api_key)
+with open("C:/Users/jessl/Downloads/api_key.txt", "r") as f:
     api_key = f.read().strip()
 client = openai.OpenAI(api_key=api_key)
+
 
 # --- Image encoding ---
 def encode_image(image_path):
@@ -45,18 +52,14 @@ def encode_image(image_path):
 def make_image_message(img_path):
     fname = os.path.basename(img_path)
     # Determine mime type
-    ext = os.path.splitext(img_path)[-1].lower()
-    if ext == ".png":
-        mime = "png"
-    else:
-        mime = "jpeg"
+    ext  = os.path.splitext(img_path)[-1].lower()
+    mime = "png" if ext == ".png" else "jpeg"
+    b64  = encode_image(img_path)
     return [
         {"type": "text", "text": f"Filename: {fname}"},
-        {
-            "type": "image_url",
-            "image_url": f"data:image/{mime};base64,{encode_image(img_path)}"
-        }
+        {"type": "image_url", "image_url": {"url": f"data:image/{mime};base64,{b64}"}}
     ]
+
 # --- Pre-Process Images ---
 def preprocess_reference_images(ref_image_paths):
     ref_msgs = []
@@ -101,9 +104,9 @@ def build_message_sequence(reference_msgs, batch_msgs, filename_to_image):
     }]
     if reference_msgs:
         messages.append({
-            "role": "assistant",
-            "content": reference_msgs
-        })
+            "role": "user",
+            "content": [{"type": "text", "text": "Reference images (context only):"}] + reference_msgs
+    })
 
     user_content = [
         {"type": "text","text": (
@@ -123,20 +126,20 @@ def build_message_sequence(reference_msgs, batch_msgs, filename_to_image):
     })
     return messages
 
-def log_token_usage_csv(token_count, log_file=LogFile):
-    log_exists = os.path.exists(log_file)
-    with token_log_lock, open(log_file, "a", newline="") as f:
-        writer = csv.writer(f)
-        if not log_exists:
-            writer.writerow(["timestamp", "total_tokens"])
-        writer.writerow([datetime.now().isoformat(), token_count])
+# def log_token_usage_csv(token_count, log_file=LogFile):
+#     log_exists = os.path.exists(log_file)
+#     with token_log_lock, open(log_file, "a", newline="") as f:
+#         writer = csv.writer(f)
+#         if not log_exists:
+#             writer.writerow(["timestamp", "total_tokens"])
+#         writer.writerow([datetime.now().isoformat(), token_count])
 
 def analyze_images_with_refs(batch_image_paths, reference_msgs):
     batch_msgs, filename_to_image = preprocess_batch_images(batch_image_paths)
     messages = build_message_sequence(reference_msgs, batch_msgs, filename_to_image)
     try:
         response = client.chat.completions.create(
-            model="gpt-4.1-mini",
+            model="gpt-4o-mini",
             messages=messages,
             response_format={"type": "text"},
             max_tokens=500
