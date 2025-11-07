@@ -33,7 +33,7 @@ def log_token_usage_csv(token_count, log_file=LogFile):
 reset_token_log_csv()
 
 # --- Key and API Setup ---
-with open("C:/Users/tower/Documents/API Keys/OpenAI_ChatGPT_Key.txt", "r") as f:
+with open("C:/Users/tower/Documents/API Keys/OpenAI_ChatGPT_Key_1.txt", "r") as f:
     api_key = f.read().strip()
 client = openai.OpenAI(api_key=api_key)
 
@@ -136,10 +136,10 @@ def analyze_images_with_refs(batch_image_paths, reference_msgs):
     messages = build_message_sequence(reference_msgs, batch_msgs, filename_to_image)
     try:
         response = client.chat.completions.create(
-            model="gpt-4.1-mini",
+            model="gpt-5",
             messages=messages,
             response_format={"type": "text"},
-            max_tokens=500
+            #max_tokens=500
         )
 
         # --- Log usage in CSV ---

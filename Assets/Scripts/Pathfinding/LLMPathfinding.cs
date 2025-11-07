@@ -39,6 +39,7 @@ namespace Pathfinding {
                                        {jsonGraph}");
 
                 var response = completion.Content[0].Text;
+                Debug.Log($"[GPT]: {completion.Usage.TotalTokenCount} tokens used.");
 
                 // Deserialize and return the result
                 Debug.Log($"[LLM Pathfinding]: {response}");

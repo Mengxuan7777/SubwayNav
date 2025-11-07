@@ -1316,7 +1316,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8.93
+      value: -9.415001
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1324,7 +1324,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 10.602
+      value: 10.19456
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1847,7 +1847,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 147.398
+      value: 147.788
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1855,7 +1855,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 24.35344
+      value: 24.262
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalRotation.w
@@ -25442,7 +25442,7 @@ MonoBehaviour:
   - {fileID: 1170969408}
   - {fileID: 1336534770}
   - {fileID: 853628524}
-  LLMPathfindingEnabled: 0
+  LLMPathfindingEnabled: 1
   pathfinding: 0
 --- !u!114 &887436461
 MonoBehaviour:
@@ -25908,9 +25908,9 @@ MonoBehaviour:
   - {fileID: 1295853786}
   - {fileID: 72240650}
   - {fileID: 1764433502}
-  fireIndex1: 0
-  InitialFireSize1: 0.75
-  UpdateFireSize1: 0.75
+  fireIndex1: 6
+  InitialFireSize1: 1.5
+  UpdateFireSize1: 1.5
   fireSpawnDelay1: 0.1
   fireUpdateDelay1: 0
   SizeUpdateIncremental1: 0
@@ -33560,7 +33560,7 @@ Transform:
   m_GameObject: {fileID: 1221415030}
   serializedVersion: 2
   m_LocalRotation: {x: 0.06162845, y: 0.70441604, z: -0.06162845, w: 0.70441604}
-  m_LocalPosition: {x: -11.34, y: 29.21, z: 6.71}
+  m_LocalPosition: {x: -11.838, y: 29.21, z: 6.71}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -36950,8 +36950,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1625333319}
   - {fileID: 1570775614}
+  - {fileID: 1625333319}
   - {fileID: 1664752326}
   - {fileID: 822358684}
   - {fileID: 1937446277}
@@ -41006,7 +41006,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 138.467
+      value: 137.982
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalPosition.y
@@ -41014,7 +41014,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 34.96644
+      value: 34.559
       objectReference: {fileID: 0}
     - target: {fileID: 2156639859875036896, guid: 3d2539e4da6bc3c40a00f219c3927232, type: 3}
       propertyPath: m_LocalRotation.w
@@ -43504,7 +43504,7 @@ GameObject:
   - component: {fileID: 1570775614}
   - component: {fileID: 1570775616}
   m_Layer: 0
-  m_Name: EX2
+  m_Name: EX1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45149,7 +45149,7 @@ GameObject:
   - component: {fileID: 1625333319}
   - component: {fileID: 1625333321}
   m_Layer: 0
-  m_Name: EX1
+  m_Name: EX2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47202,7 +47202,7 @@ GameObject:
   - component: {fileID: 1734831306}
   - component: {fileID: 1734831308}
   m_Layer: 0
-  m_Name: NM
+  m_Name: SM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49466,7 +49466,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.3899994
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalPosition.y
@@ -49474,7 +49474,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.0914402
       objectReference: {fileID: 0}
     - target: {fileID: 1216767235114090588, guid: 4c22f0dcea03a1847a6fc11903cebf15, type: 3}
       propertyPath: m_LocalRotation.w

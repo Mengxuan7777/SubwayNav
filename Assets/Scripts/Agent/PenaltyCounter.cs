@@ -9,7 +9,7 @@ public class PenaltyCounter : MonoBehaviour {
     private static int collisionWithPedestrian;
 
     [Header("Log Settings")] 
-    private const string LogPath = "Users/tower/Documents/Unity Projects/SubwayNav/Assets/Logs/";
+    private const string LogPath = @"C:\Users\tower\Documents\Unity Projects\SubwayNav\Assets\StreamingAssets\PenaltyLog\";
     private static StreamWriter writer;
 
     private void Start() {

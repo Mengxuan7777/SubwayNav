@@ -63,6 +63,7 @@ namespace Camera {
             // It also updated the edge costs
             await RunPythonScript(path, referenceImageFolder);
             
+            
             // Set up barrier to prevent path recalculation before RuntPythonScript ends
             var barrier = new TaskCompletionSource<bool>();
             MainThreadDispatcher.Enqueue(() => barrier.SetResult(true));
@@ -107,7 +108,7 @@ namespace Camera {
                     if (!string.IsNullOrWhiteSpace(line)) {
                         // This line updates Unity objects: needs to be back on main thread
                         MainThreadDispatcher.Enqueue(() => pathfindingManager.UpdateEdgeWeights(line));
-                        //Debug.Log($"[Python Result (batch)]: {line}");
+                        Debug.Log($"[Python Result (batch)]: {line}");
                     }
                 }
                 process.WaitForExit();

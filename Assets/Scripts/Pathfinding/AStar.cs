@@ -41,7 +41,7 @@ namespace Pathfinding {
                 foreach (var edge in current.Edges) {
                     Node neighbor = edge.TargetNode;
                     float tentativeG = gScore[current] + edge.Weight;
-                    //Debug.Log($"Evaluating Node: {neighbor.Name}, tentativeG: {tentativeG}, danger: {neighbor.DangerLevel}, edge.Weight: {edge.Weight}");
+                    Debug.Log($"Evaluating Node: {neighbor.Name}, tentativeG: {tentativeG}, danger: {neighbor.DangerLevel}, edge.Weight: {edge.Weight}");
 
                     if (!gScore.ContainsKey(neighbor) || tentativeG < gScore[neighbor]) {
                         cameFrom[neighbor] = current;

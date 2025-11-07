@@ -36,8 +36,8 @@ namespace Pathfinding {
         
         // Constants
         private const int crowdPenaltyMultiplier = 5,
-            firePenaltyMultiplier = 5000;
-        public readonly string logFilePath = Application.streamingAssetsPath + "/TimeLog/" +"TEST1.csv";
+            firePenaltyMultiplier = 500;
+        public readonly string logFilePath = Application.streamingAssetsPath + "/TimeLog/" +"s1_T1.csv";
         
         private void Start() {
             // Gather agent info
@@ -123,9 +123,6 @@ namespace Pathfinding {
             foreach (var t in targetNodes) {
                 clonedTargets.Add(nodeMap[t]);
             }
-               
-
-            
             return (new List<Node>(nodeMap.Values), clonedStart, clonedTargets);
         }
 
