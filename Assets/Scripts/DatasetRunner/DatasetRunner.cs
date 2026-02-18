@@ -27,7 +27,7 @@ public class DatasetRunnerZones : MonoBehaviour
 
 
     [Header("Scene Root")]
-    public string cameraRootName = "SurvCamera"; // parent object of all 36 cameras
+    public string cameraRootName = "SurvCamera (1)"; // parent object of all 36 cameras
 
     [Header("Prefabs")]
     public GameObject firePrefab;
